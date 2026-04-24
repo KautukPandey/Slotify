@@ -57,7 +57,7 @@ export const getAvailableSlots = async(req,res) => {
 
 export const bookSlot = async(req,res) => {
     try {
-        const {slotId} = req.query
+        const {slotId} = req.params
 
         if (!slotId) {
             return res.status(400).json({ message: "Slot ID is required" })
@@ -85,5 +85,48 @@ export const bookSlot = async(req,res) => {
     } catch (error) {
         console.log(error);
         return res.status(500).json({message:"Error while booking slots"})
+    }
+}
+
+export const cancelBooking = async(req,res) => {
+    try {
+        const {slotId} = req.params
+        if(!slotId){
+            return res.status(400).json({ message: "Slot ID is required" })
+        }
+        const slot = await Slot.findOneAndUpdate(
+            {
+                _id:slotId,
+                isBooked: true,
+                bookedBy: req.user._id
+            },{
+                isBooked: false,
+                bookedBy: null
+            },
+            {new:true}
+        )
+        if(!slot){
+            return res.status(400).json({message:"Slot not found or not authorized to cancel"})
+        }
+
+        return res.status(200).json({message:"Slot cancelled",slot})
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message:"Error while cancelling the booking"})
+    }
+}
+
+export const getMyBookings = async(req,res) => {
+    try {
+        const slots = await Slot.find({bookedBy:req.user._id}).sort({createdAt:-1})
+
+        return res.status(200).json({
+            message:"Slots fetched",
+            count: slots.length,
+            slots
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message:"Error while getting bookings"})
     }
 }
