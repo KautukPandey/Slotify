@@ -59,7 +59,29 @@ export const bookSlot = async(req,res) => {
     try {
         const {slotId} = req.query
 
-        
+        if (!slotId) {
+            return res.status(400).json({ message: "Slot ID is required" })
+        }
+
+        const slot = await Slot.findOneAndUpdate({
+            _id: slotId,
+            isBooked: false
+        },{
+            isBooked: true,
+            bookedBy: req.user._id
+        })
+
+        if(!slot){
+            return res.status(400).json({
+                message:"Slot not available or already booked"
+            })
+        }
+
+        return res.status(200).json({
+            message: "Slot booked",
+            slot    
+        })
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({message:"Error while booking slots"})

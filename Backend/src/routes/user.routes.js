@@ -1,13 +1,12 @@
 import express from "express"
 import {protect} from "../middlewares/protect.js"
+import { authorizeRoles } from "../middlewares/role.js"
+import { bookSlot } from "../controllers/slot.controller.js"
 
 const router = express.Router()
 
-router.get("/profile",protect,(req,res)=>{
-    return res.status(200).json({
-        message: "User profile",
-        user: req.user
-    })
-})
+router.post("/book-slot",protect,authorizeRoles("user"),bookSlot)
+router.post("/create-slot", protect, authorizeRoles("admin"), createSlot)
+
 
 export default router
