@@ -42,19 +42,31 @@ export const createSlot = async(req,res) => {
 
 export const getAvailableSlots = async(req,res) => {
     try {
-        const { date } = req.query
+        const { date ,serviceId} = req.query
 
-        const filter = {
-            isBooked: false
+        if (!serviceId) {
+            return res.status(400).json({
+                message: "serviceId is required"
+            })
         }
-
+        
+        const service = await Service.findById(serviceId)
+        if (!service || !service.isActive) {
+            return res.status(404).json({
+                message: "Service not found or inactive"
+            })
+        }
+        const filter = {
+            isBooked: false,
+            service: serviceId
+        }
         if (date) {
             const normalizedDate = new Date(date)
             normalizedDate.setHours(0, 0, 0, 0)
             filter.date = normalizedDate
         }
 
-        const slots = await Slot.find(filter)
+        const slots = await Slot.find(filter).sort({time:1}).select("date time")
         return res.status(200).json({
             message: "Slots fetched successfully",
             count: slots.length,
