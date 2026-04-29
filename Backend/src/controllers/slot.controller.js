@@ -1,18 +1,30 @@
 import Slot from "../models/slot.model.js"
+import Service from "../models/service.model.js"
+
 
 export const createSlot = async(req,res) => {
     try {
-        const {date,time} = req.body
-        if(!date || !time){
-            return res.status(400).json({message:"Both fields required"})
+        const {date,time,serviceId} = req.body
+        if(!date || !time || !serviceId){
+            return res.status(400).json({message:"Complete fields required"})
         }
-
+        const service = await Service.findById(serviceId)
+        if(!service){
+            return res.status(400).json({message:"Service does not exist"})
+        }
+        if (!service.isActive) {
+            return res.status(400).json({ message: "Service is not active" })
+        }
+        if (service.createdBy.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "Not authorized" })
+        }
         const normalizedDate = new Date(date)
         normalizedDate.setHours(0, 0, 0, 0)
         const slot = await Slot.create({
             date: normalizedDate,
             time,
-            createdBy: req.user._id
+            createdBy: req.user._id,
+            service: serviceId
         })
         return res.status(201).json({
             message: "Slot created successfully",

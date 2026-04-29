@@ -21,10 +21,16 @@ const slotSchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        default: null
+        default: null,
+        required: true
+    },
+    service: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Service",
+        required: true
     }
 },{timestamps:true})
 
-slotSchema.index({ date: 1, time: 1},{ unique:true })
+slotSchema.index({ date: 1, time: 1, service: 1},{ unique:true })
 
 export default mongoose.model("Slot",slotSchema)
