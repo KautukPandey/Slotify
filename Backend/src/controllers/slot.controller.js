@@ -176,3 +176,87 @@ export const getMyBookings = async(req,res) => {
         return res.status(500).json({message:"Error while getting bookings"})
     }
 }
+
+export const rescheduleBooking = async(req,res) => {
+    try {
+        const {oldSlotId,newSlotId} = req.body
+
+        if(!oldSlotId || !newSlotId){
+            return res.status(400).json({message: "Both IDs are required"})
+        }
+
+        if (oldSlotId === newSlotId) {
+            return res.status(400).json({
+                message: "Cannot reschedule to the same slot"
+            })
+        }
+
+        const oldSlot = await Slot.findById(oldSlotId)
+        const newSlot = await Slot.findById(newSlotId)
+
+        if (!oldSlot || !newSlot) {
+            return res.status(404).json({
+                message: "One or both slots not found"
+            })
+        }
+
+        if(!oldSlot.isBooked || oldSlot.bookedBy.toString() !== req.user._id.toString()){
+            return res.status(403).json({
+                message: "Not authorized to reschedule this slot"
+            })
+        }
+
+        if (newSlot.isBooked) {
+            return res.status(400).json({
+                message: "New slot is already booked"
+            })
+        }
+
+        const now = new Date()
+        const today = new Date()
+        today.setHours(0,0,0,0)
+        
+        const slotDate = new Date(newSlot.date)
+        slotDate.setHours(0, 0, 0, 0)
+
+        const currentTime = now.toTimeString().slice(0, 5)
+
+        if(slotDate < today || (slotDate.getTime()===today.getTime() && newSlot.time <= currentTime)){
+            return res.status(400).json({
+                message: "Cannot reschedule to a past slot"
+            })
+        }
+
+        const bookedNewSlot = await Slot.findOneAndUpdate({
+            _id: newSlotId,
+            isBooked: false
+        },{
+            isBooked: true,
+            bookedBy: req.user._id
+        },{new: true})
+
+        if (!bookedNewSlot) {
+            return res.status(400).json({
+                message: "Failed to book new slot (already taken)"
+            })
+        }
+
+        await Slot.findOneAndUpdate({
+            _id: oldSlotId,
+            isBooked: true,
+            bookedBy: req.user._id
+        },{
+            isBooked: false,
+            bookedBy: null
+        })
+
+        return res.status(200).json({
+            message: "Rescheduled successfully",
+            newSlot: bookedNewSlot
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: "Error while rescheduling"})
+    }
+}
