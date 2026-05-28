@@ -66,3 +66,18 @@ export const loginUser = async(req,res)=>{
         return res.status(500).json({message:"Error in login of user "})
     }
 }
+
+export const getMe = async(req,res)=>{
+    try {
+        const {name} = req.user
+        
+        console.log(req.user)
+        return res.status(200).json({
+            message: "Name fetched",
+            name
+        })
+    } catch (error) {
+        console.log("Error in getting info of user ",error);
+        return res.status(500).json({message:"Error in getting info of user "})
+    }
+}

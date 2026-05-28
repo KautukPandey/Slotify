@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken"
+import User from "../models/user.model.js"
 
-export const protect = (req,res,next) => {
+export const protect = async(req,res,next) => {
     try {
         const authHeader = req.headers.authorization
 
@@ -19,9 +20,9 @@ export const protect = (req,res,next) => {
         }
 
         const decoded = jwt.verify(token,process.env.JWTSECRET)
-
-        req.user = decoded
-
+        const user = await User.findById(decoded._id)
+        req.user = user
+        console.log(req.headers.authorization)
         next()
     } catch (error) {
         console.log(error);
