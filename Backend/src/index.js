@@ -13,7 +13,7 @@ app.use(express.json())
 app.use(cors());
 app.use("/api/auth", authRoutes)
 app.use("/api/slot", slotRoutes)
-console.log("ENV:", process.env.MONGODB_URI)
+
 app.listen(PORT,()=>{
     console.log(`Server running on ${PORT}`);
     

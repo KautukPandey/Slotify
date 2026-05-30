@@ -14,12 +14,21 @@ const Dashboard = () => {
 
     const getName = async() => {
       const response = await api.get("/auth/getMe", {
-                                headers: {
-                                  Authorization: `Bearer ${token}`
-                                }
-                              })
+        headers: {
+          Authorization: `Bearer ${token}`
+          }
+        })
       setName(response.data.name)
       console.log(response.data)
+    }
+
+    const getAppointments = async() => {
+      try {
+        const response = await api.get("/slot/")
+      } catch (error) {
+        console.log(error);
+        
+      }
     }
     getName()
   },[])

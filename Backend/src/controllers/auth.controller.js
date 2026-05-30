@@ -4,10 +4,11 @@ import jwt from "jsonwebtoken"
 
 export const registerUser = async(req,res)=>{
     try {
-        const {name,email,password} = req.body
-        if(!name || !email || !password){
+        const {name,email,password,city,role} = req.body
+        if(!name || !email || !password || !city){
             return res.status(400).json({message:"Bad request!! Fields cannot be empty"})
         }
+        const assignedRole = ['customer','provider'].includes(role) ? role : 'customer'
         const lowerEmail = email.toLowerCase()
         if(!lowerEmail.includes('@')){
             return res.status(400).json({message:"Invalid email format"})
@@ -19,7 +20,7 @@ export const registerUser = async(req,res)=>{
         if(existingUser){
             return res.status(409).json({message:"User already exists"})
         }
-        const user = await User.create({name,email:lowerEmail,password})
+        const user = await User.create({ name, email: lowerEmail, password, role: assignedRole, city })
 
         return res.status(201).json(
             {
@@ -27,7 +28,9 @@ export const registerUser = async(req,res)=>{
                 user: {
                     _id:user._id,
                     name,
-                    email:lowerEmail
+                    email:lowerEmail,
+                    city,
+                    role
                 }
             }
         )
@@ -69,13 +72,12 @@ export const loginUser = async(req,res)=>{
 
 export const getMe = async(req,res)=>{
     try {
-        const {name} = req.user
-        
-        console.log(req.user)
+        const user = await User.findById(req.user._id).select("-password")
         return res.status(200).json({
-            message: "Name fetched",
-            name
-        })
+            message: "User fetched",
+            user
+            })
+        
     } catch (error) {
         console.log("Error in getting info of user ",error);
         return res.status(500).json({message:"Error in getting info of user "})

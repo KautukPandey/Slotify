@@ -2,7 +2,7 @@ import Service from "../models/service.model.js";
 
 export const createService = async(req,res)=>{
     try {
-        const {name,description,price,duration} = req.body
+        let {name,description,price,duration} = req.body
 
         if(!name || !description || !price || !duration){
             return res.status(400).json({message:"Fields cannot be empty"})
@@ -19,7 +19,7 @@ export const createService = async(req,res)=>{
 
         const existingService = await Service.findOne({
             name,
-            createdBy: req.user._id
+            provider: req.provider._id
         })
 
         if (existingService) {
@@ -33,7 +33,7 @@ export const createService = async(req,res)=>{
             description,
             price,
             duration,
-            createdBy: req.user._id
+            provider: req.provider._id
         })
 
         return res.status(201).json({message:"Service created",service})

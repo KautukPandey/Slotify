@@ -19,9 +19,9 @@ const serviceSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    createdBy: {
+    provider: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Provider",
         required: true
     },
     isActive: {

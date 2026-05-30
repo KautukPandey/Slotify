@@ -22,7 +22,7 @@ export const protect = async(req,res,next) => {
         const decoded = jwt.verify(token,process.env.JWTSECRET)
         const user = await User.findById(decoded._id)
         req.user = user
-        console.log(req.headers.authorization)
+        
         next()
     } catch (error) {
         console.log(error);

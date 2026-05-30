@@ -9,19 +9,9 @@ const slotSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    isBooked: {
-        type: Boolean,
-        default: false
-    },
-    bookedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        default: null
-    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        default: null,
+        ref: "Provider",
         required: true
     },
     service: {
