@@ -92,7 +92,9 @@ export const getAvailableSlots = async(req,res) => {
             }
         }
 
-        const slots = await Slot.find(filter).sort({time:1}).select("date time")
+        const slots = await Slot.find(filter)
+        .sort({time:1})
+        .select("date time")
         return res.status(200).json({
             message: "Slots fetched successfully",
             count: slots.length,
