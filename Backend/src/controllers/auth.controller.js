@@ -30,7 +30,7 @@ export const registerUser = async(req,res)=>{
                     name,
                     email:lowerEmail,
                     city,
-                    role
+                    role: user.role
                 }
             }
         )
@@ -58,7 +58,7 @@ export const loginUser = async(req,res)=>{
         if(!isMatch){
             return res.status(401).json({message:"Invalid credentials"})
         }
-        const token = jwt.sign({_id:user._id,role:user.role},process.env.JWTSECRET,{expiresIn:"3days"})
+        const token = jwt.sign({_id:user._id,role:user.role},process.env.JWTSECRET,{expiresIn:"3d"})
 
         return res.status(200).json({
             message: "Login successful",

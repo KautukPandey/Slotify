@@ -1,6 +1,6 @@
 import Slot from "../models/slot.model.js"
 import Service from "../models/service.model.js"
-
+import Booking from "../models/booking.model.js"
 
 export const createSlot = async(req,res) => {
     try {

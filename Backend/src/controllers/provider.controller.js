@@ -23,7 +23,7 @@ export const createProfile = async(req,res) => {
             user: req.user._id
         })
 
-        return res.status(200).json({
+        return res.status(201).json({
             message:"Provider profile created",
             provider
         })

@@ -21,6 +21,9 @@ export const protect = async(req,res,next) => {
 
         const decoded = jwt.verify(token,process.env.JWTSECRET)
         const user = await User.findById(decoded._id)
+        if(!user){
+            return res.status(401).json({message: "User does not exists"})
+        }
         req.user = user
         
         next()
