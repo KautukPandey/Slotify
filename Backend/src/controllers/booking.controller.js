@@ -110,3 +110,51 @@ export const cancelBooking = async(req,res) => {
         return res.status(500).json({message: "Error while cancelling booking"})
     }
 }
+
+export const getProviderBookings = async(req,res) => {
+    try {
+        const providerBookings = await Booking.find({
+            provider: req.provider._id
+        })
+        .populate("service","name")
+        .populate("slot","date time")
+        .populate("customer","name email")
+
+        return res.status(200).json({
+            message: "Provider's bookings fetched",
+            providerBookings
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: "Error in getting Provider's booking"})
+    }
+}
+
+export const completeBooking = async(req,res) => {
+    try {
+        const {bookingId} = req.body
+        if(!bookingId){
+            return res.status(400).json({message: "Booking ID missing"})
+        }
+        const booking = await Booking.findById(bookingId)
+        if(!booking){
+            return res.status(404).json({message: "Booking doesn't exists"})
+        }
+        if(booking.status==="cancelled" || booking.status==="completed"){
+            return res.status(400).json({message: "Booking already completed/cancelled"})
+        }
+        if(booking.customer.toString()!==req.provider._id.toString()){
+            return res.status(403).json({message: "Forbidden"})
+        }
+        booking.status = "completed"
+        await booking.save()
+
+        return res.status(200).json({
+            message: "Booking completed",
+            booking
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: "Error in completing the booking"})
+    }
+}

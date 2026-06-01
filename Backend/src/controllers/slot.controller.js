@@ -107,6 +107,24 @@ export const getAvailableSlots = async(req,res) => {
     }
 }
 
+export const getMySlots = async(req,res) => {
+    try {
+        const mySlots = await Slot.find({
+            createdBy: req.provider._id
+        })
+        .populate("service","name")
+
+        return res.status(200).json({
+            message: "Fetched all of the provider's slots",
+            mySlots
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: "Error in getting my slots"})
+    }
+}
+
+
 // export const getMyBookings = async(req,res) => {
 //     try {
 //         const slots = await Slot.find({bookedBy:req.user._id}).sort({createdAt:-1})

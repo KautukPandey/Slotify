@@ -1,6 +1,6 @@
 import Service from "../models/service.model.js";
 
-export const createService = async(req,res)=>{
+export const createService = async(req,res) => {
     try {
         let {name,description,price,duration} = req.body
 
@@ -43,7 +43,7 @@ export const createService = async(req,res)=>{
     }
 }
 
-export const getAllServices = async(req,res)=>{
+export const getAllServices = async(req,res) => {
     try {
          const services = await Service.find({isActive:true})
                     .sort({createdAt:-1})
@@ -57,5 +57,21 @@ export const getAllServices = async(req,res)=>{
     } catch (error) {
         console.log(error);
         return res.status(500).json({message:"Error while fetching all services"})
+    }
+}
+
+export const getMyServices = async(req,res) => {
+    try {
+        const myServices = await Service.find({
+            provider: req.provider._id
+        })
+        
+        return res.status(200).json({
+            message: "Fetched all my services",
+            myServices
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: "Error in getting my services"})
     }
 }
