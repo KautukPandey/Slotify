@@ -14,7 +14,7 @@ export const providerProtect = async (req, res, next) => {
     
   } catch (error) {
       console.log(error);
-      process.exit(1);
+      return res.status(500).json({message: "Couldn't verify provider's ID"})
 
   }
 }

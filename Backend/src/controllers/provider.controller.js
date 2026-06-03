@@ -2,6 +2,11 @@ import Provider from "../models/provider.model.js";
 
 export const createProfile = async(req,res) => {
     try {
+        if(req.user.role !== "provider"){
+            return res.status(403).json({
+                message: "Providers only"
+            })
+        }
         let {businessName,city,description} = req.body
         if(!businessName || !city || !description){
             return res.status(400).json({message:"Fields cannot be empty"})
@@ -39,6 +44,7 @@ export const getProviders = async(req,res) => {
         let {city} = req.query
         const filter = {}
         if(city){
+            city = city.toLowerCase()
             filter.city = city
         }
 

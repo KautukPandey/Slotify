@@ -1,4 +1,5 @@
 import Service from "../models/service.model.js";
+import Provider from "../models/provider.model.js";
 
 export const createService = async(req,res) => {
     try {
@@ -73,5 +74,33 @@ export const getMyServices = async(req,res) => {
     } catch (error) {
         console.log(error);
         return res.status(500).json({message: "Error in getting my services"})
+    }
+}
+
+export const getProviderServices = async(req,res) => {
+    try {
+        const {providerId} = req.params
+        if(!providerId){
+            return res.status(400).json({message:"Provider's Id is required"})
+        }
+
+        const provider = await Provider.findById(providerId)
+        if(!provider){
+            return res.status(404).json({message: "Provider doesn't exist"})
+        }
+
+        const services = await Service.find({
+            provider: providerId,
+            isActive: true
+        })
+
+        return res.status(200).json({
+            message: "All the services fetched",
+            services    
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: "Error in getting this provider's services"})
     }
 }

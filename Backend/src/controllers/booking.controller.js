@@ -143,7 +143,7 @@ export const completeBooking = async(req,res) => {
         if(booking.status==="cancelled" || booking.status==="completed"){
             return res.status(400).json({message: "Booking already completed/cancelled"})
         }
-        if(booking.customer.toString()!==req.provider._id.toString()){
+        if(booking.provider.toString()!==req.provider._id.toString()){
             return res.status(403).json({message: "Forbidden"})
         }
         booking.status = "completed"
