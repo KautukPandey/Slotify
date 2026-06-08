@@ -2,7 +2,7 @@
 
 > A full-stack appointment booking platform that connects customers with service providers through a simple scheduling workflow.
 
-🔗 **[Live Demo](https://your-slotify-url.onrender.com)** &nbsp;|&nbsp; 📄 **[Architecture & Design Decisions](./ARCHITECTURE.md)**
+🔗 **[Live Demo](https://slotify-olive.vercel.app/)** &nbsp;|&nbsp; 📄 **[Architecture & Design Decisions](./ARCHITECTURE.md)**
 
 ---
 
