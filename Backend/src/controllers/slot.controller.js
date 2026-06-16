@@ -1,129 +1,137 @@
-import Slot from "../models/slot.model.js"
-import Service from "../models/service.model.js"
-import Booking from "../models/booking.model.js"
+import Slot from "../models/slot.model.js";
+import Service from "../models/service.model.js";
+import Booking from "../models/booking.model.js";
 
-export const createSlot = async(req,res) => {
-    try {
-        const {date,time,serviceId} = req.body
-        if(!date || !time || !serviceId){
-            return res.status(400).json({message:"Complete fields required"})
-        }
-        const service = await Service.findById(serviceId)
-        if(!service){
-            return res.status(400).json({message:"Service does not exist"})
-        }
-        if (!service.isActive) {
-            return res.status(400).json({ message: "Service is not active" })
-        }
-        if (service.provider.toString() !== req.provider._id.toString()) {
-            return res.status(403).json({ message: "Not authorized" })
-        }
-        const normalizedDate = new Date(date)
-        normalizedDate.setHours(0, 0, 0, 0)
-        const slot = await Slot.create({
-            date: normalizedDate,
-            time,
-            createdBy: req.provider._id,
-            service: serviceId
-        })
-        return res.status(201).json({
-            message: "Slot created successfully",
-            slot
-        })
-        
-    } catch (error) {
-        if (error.code === 11000) {
-            return res.status(400).json({ message: "Slot already exists" })
-        }
-        console.log(error);
-        return res.status(400).json({message: "Error in creating slot"})
+export const createSlot = async (req, res) => {
+  try {
+    const { date, time, serviceId } = req.body;
+    if (!date || !time || !serviceId) {
+      return res.status(400).json({ message: "Complete fields required" });
     }
-}
+    const service = await Service.findById(serviceId);
+    if (!service) {
+      return res.status(400).json({ message: "Service does not exist" });
+    }
+    if (!service.isActive) {
+      return res.status(400).json({ message: "Service is not active" });
+    }
+    if (service.provider.toString() !== req.provider._id.toString()) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+    const normalizedDate = new Date(date);
+    normalizedDate.setHours(0, 0, 0, 0);
+    const slot = await Slot.create({
+      date: normalizedDate,
+      time,
+      createdBy: req.provider._id,
+      service: serviceId,
+    });
+    return res.status(201).json({
+      message: "Slot created successfully",
+      slot,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: "Slot already exists" });
+    }
+    console.log(error);
+    return res.status(400).json({ message: "Error in creating slot" });
+  }
+};
 
-export const getAvailableSlots = async(req,res) => {
-    try {
-        const { date ,serviceId} = req.query
+export const getAvailableSlots = async (req, res) => {
+  try {
+    const { date, serviceId } = req.query;
 
-        if (!serviceId) {
-            return res.status(400).json({
-                message: "serviceId is required"
-            })
-        }
-        
-        const service = await Service.findById(serviceId)
+    if (!serviceId) {
+      return res.status(400).json({
+        message: "serviceId is required",
+      });
+    }
 
-        if (!service || !service.isActive) {
-            return res.status(404).json({
-                message: "Service not found or inactive"
-            })
-        }
+    const service = await Service.findById(serviceId);
 
-        const now = new Date()
-        const today = new Date()
-        today.setHours(0,0,0,0)
+    if (!service || !service.isActive) {
+      return res.status(404).json({
+        message: "Service not found or inactive",
+      });
+    }
 
-        const currentTime = now.toTimeString().slice(0,5)
+    const now = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-        const bookedSlotIds = await Booking.find({
-            service: serviceId,
-            status: "confirmed"
-        }).distinct("slot")
-        const filter = {
-            service: serviceId,
-            _id: { $nin: bookedSlotIds }
-        }
-        if (date) {
-            const selectedDate = new Date(date)
-            selectedDate.setHours(0,0,0,0)
+    const currentTime = now.toTimeString().slice(0, 5);
 
-            if(selectedDate>today){
-                filter.date = selectedDate
-            }
-            else if(selectedDate.getTime()===today.getTime()){
-                filter.date = selectedDate
-                filter.time = { $gt: currentTime}
-            }
-            else{
-                return res.status(200).json({
-                    message: "No slots available",
-                    count: 0,
-                    slots: []
-                })
-            }
-        }
+    const bookedSlotIds = await Booking.find({
+      service: serviceId,
+      status: "confirmed",
+    }).distinct("slot");
+    const filter = {
+      service: serviceId,
+      _id: { $nin: bookedSlotIds },
+    };
+    if (date) {
+      const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);
 
-        const slots = await Slot.find(filter)
-        .sort({time:1})
-        .select("date time")
+      if (selectedDate > today) {
+        filter.date = selectedDate;
+      } else if (selectedDate.getTime() === today.getTime()) {
+        filter.date = selectedDate;
+        filter.time = { $gt: currentTime };
+      } else {
         return res.status(200).json({
-            message: "Slots fetched successfully",
-            count: slots.length,
-            slots
-        })
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({message:"Error in getting available slots"})
+          message: "No slots available",
+          count: 0,
+          slots: [],
+        });
+      }
     }
-}
 
-export const getMySlots = async(req,res) => {
-    try {
-        const mySlots = await Slot.find({
-            createdBy: req.provider._id
-        })
-        .populate("service","name")
+    const slots = await Slot.find(filter).sort({ time: 1 }).select("date time");
 
-        return res.status(200).json({
-            message: "Fetched all of the provider's slots",
-            mySlots
-        })
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({message: "Error in getting my slots"})
-    }
-}
+    const availableSlots = slots.filter((slot) => {
+      const slotDateTime = new Date(slot.date);
 
+      const [hours, minutes] = slot.time.split(":");
+
+      slotDateTime.setHours(Number(hours));
+      slotDateTime.setMinutes(Number(minutes));
+      slotDateTime.setSeconds(0);
+      slotDateTime.setMilliseconds(0);
+
+      return slotDateTime > now;
+    });
+
+    return res.status(200).json({
+      message: "Slots fetched successfully",
+      count: availableSlots.length,
+      slots: availableSlots,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error in getting available slots" });
+  }
+};
+
+export const getMySlots = async (req, res) => {
+  try {
+    const mySlots = await Slot.find({
+      createdBy: req.provider._id,
+    }).populate("service", "name");
+
+    return res.status(200).json({
+      message: "Fetched all of the provider's slots",
+      mySlots,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error in getting my slots" });
+  }
+};
 
 // export const getMyBookings = async(req,res) => {
 //     try {
@@ -178,7 +186,7 @@ export const getMySlots = async(req,res) => {
 //         const now = new Date()
 //         const today = new Date()
 //         today.setHours(0,0,0,0)
-        
+
 //         const slotDate = new Date(newSlot.date)
 //         slotDate.setHours(0, 0, 0, 0)
 

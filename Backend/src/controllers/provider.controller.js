@@ -41,13 +41,19 @@ export const createProfile = async(req,res) => {
 
 export const getProviders = async(req,res) => {
     try {
-        let {city} = req.query
+        let {city,search} = req.query
         const filter = {}
         if(city){
             city = city.toLowerCase()
             filter.city = city
         }
-
+        if(search){
+            search = search?.trim()
+            filter.businessName = {
+                $regex: search,
+                $options: "i"
+            }
+        }
         const providers = await Provider.find(filter)
 
         return res.status(200).json({

@@ -9,8 +9,13 @@ const providerService = {
    * @param {string} city - Optional city filter
    * @returns {Promise<object>} Response containing message and providers array
    */
-  getProviders: async (city) => {
+  getProviders: async (search = "", city = "") => {
     const params = {};
+
+    if (search) {
+      params.search = search.trim();
+    }
+
     if (city) {
       params.city = city.trim();
     }
