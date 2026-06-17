@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
+import { SkeletonCard } from "../components/LoadingSpinner";
 import providerService from "../services/providerService";
 import { extractErrorMessage } from "../services/api";
 
@@ -12,19 +13,11 @@ const Providers = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchProviders = async (
-    searchValue = "",
-    cityValue = ""
-  ) => {
+  const fetchProviders = async (searchValue = "", cityValue = "") => {
     setLoading(true);
     setError(null);
-
     try {
-      const data = await providerService.getProviders(
-        searchValue,
-        cityValue
-      );
-
+      const data = await providerService.getProviders(searchValue, cityValue);
       setProviders(data.providers || []);
     } catch (err) {
       setError(extractErrorMessage(err));
@@ -33,122 +26,111 @@ const Providers = () => {
     }
   };
 
-  useEffect(() => {
-    fetchProviders();
-  }, []);
+  useEffect(() => { fetchProviders(); }, []);
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    fetchProviders(search, city);
-  };
-
-  const handleClear = () => {
-    setSearch("");
-    setCity("");
-    fetchProviders();
-  };
+  const handleSearchSubmit = (e) => { e.preventDefault(); fetchProviders(search, city); };
+  const handleClear = () => { setSearch(""); setCity(""); fetchProviders(); };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-150 flex flex-col">
-      <Navbar />
-
-      <main className="flex-1 max-w-6xl w-full mx-auto p-6">
-        <PageHeader
-          title="Service Providers"
-          subtitle="Find and book scheduled sessions with local business providers"
-        >
-          <form
-            onSubmit={handleSearchSubmit}
-            className="flex flex-wrap gap-2 w-full"
-          >
-            <input
-              type="text"
-              placeholder="Search provider..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 min-w-[200px] px-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all"
-            />
-
-            <select
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="px-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 rounded-lg"
-            >
+    <Layout>
+      <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 animate-fade-in">
+        <PageHeader title="Service Providers" subtitle="Find and book scheduled sessions with local business providers">
+          <form onSubmit={handleSearchSubmit} className="flex flex-wrap gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 min-w-[180px]">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Search provider..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="input pl-10"
+              />
+            </div>
+            <select value={city} onChange={(e) => setCity(e.target.value)} className="input w-auto min-w-[130px]">
               <option value="">All Cities</option>
               <option value="delhi">Delhi</option>
               <option value="mumbai">Mumbai</option>
               <option value="pune">Pune</option>
               <option value="bangalore">Bangalore</option>
             </select>
-
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-semibold text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors cursor-pointer shadow-sm shadow-violet-500/10"
-            >
-              Search
-            </button>
-
+            <button type="submit" className="btn-primary">Search</button>
             {(search || city) && (
-              <button
-                type="button"
-                onClick={handleClear}
-                className="px-3 py-2 text-sm text-slate-500 border border-slate-300 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-850 rounded-lg cursor-pointer transition-colors"
-              >
-                Clear
-              </button>
+              <button type="button" onClick={handleClear} className="btn-secondary">Clear</button>
             )}
           </form>
         </PageHeader>
 
         {error && (
-          <div className="p-4 mb-6 text-sm text-red-700 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-xl">
+          <div className="p-4 mb-6 text-sm text-red-700 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-lg flex items-center gap-2">
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
             {error}
           </div>
         )}
 
         {loading ? (
-          <div className="text-center py-12 text-slate-550 dark:text-zinc-400">
-            Loading service providers...
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <SkeletonCard count={6} />
           </div>
         ) : providers.length === 0 ? (
-          <div className="text-center py-12 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800">
-            <p className="text-slate-500 dark:text-zinc-400">
-              No service providers found.
-            </p>
+          <div className="card p-12 text-center">
+            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-zinc-100 mb-1">No providers found</h3>
+            <p className="text-sm text-slate-500 dark:text-zinc-400 mb-4">Try adjusting your search or filters.</p>
+            {(search || city) && (
+              <button onClick={handleClear} className="btn-secondary">Clear filters</button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {providers.map((provider) => (
-              <div
-                key={provider._id}
-                className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col justify-between hover:shadow-md hover:border-slate-300 dark:hover:border-zinc-700 transition-all duration-150"
-              >
+              <div key={provider._id} className="card-hover p-6 flex flex-col justify-between group">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100 capitalize mb-1">
-                    {provider.businessName}
-                  </h3>
-
-                  <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400 mb-3">
-                    📍 {provider.city}
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-accent-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                      {(provider.businessName || "P").charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-slate-900 dark:text-zinc-100 capitalize leading-tight">
+                        {provider.businessName}
+                      </h3>
+                      <span className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-zinc-400">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                        </svg>
+                        {provider.city}
+                      </span>
+                    </div>
                   </div>
-
                   <p className="text-sm text-slate-600 dark:text-zinc-400 line-clamp-3 mb-4 leading-relaxed">
                     {provider.description}
                   </p>
                 </div>
-
                 <Link
                   to={`/providers/${provider._id}`}
-                  className="w-full text-center py-2.5 text-xs font-bold text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-900 hover:bg-violet-50 dark:hover:bg-violet-950/25 rounded-xl transition-all"
+                  className="btn-secondary w-full justify-center text-xs group-hover:border-brand-200 dark:group-hover:border-brand-800 transition-colors"
                 >
                   View Details & Services
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
                 </Link>
               </div>
             ))}
           </div>
         )}
       </main>
-    </div>
+    </Layout>
   );
 };
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
+import { SkeletonStats } from "../components/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
 import providerDashboardService from "../services/providerDashboardService";
 import providerBookingService from "../services/providerBookingService";
@@ -27,14 +28,11 @@ const ProviderDashboard = () => {
         } catch (err) {
           console.warn("Could not load provider profile:", err);
         }
-
-        // Fetch counts in parallel
         const [servicesData, slotsData, bookingsData] = await Promise.all([
           providerDashboardService.getMyServices().catch(() => ({ myServices: [] })),
           providerDashboardService.getMySlots().catch(() => ({ mySlots: [] })),
           providerBookingService.getProviderBookings().catch(() => ({ providerBookings: [] })),
         ]);
-
         setCounts({
           services: servicesData.myServices?.length || 0,
           slots: slotsData.mySlots?.length || 0,
@@ -46,145 +44,135 @@ const ProviderDashboard = () => {
         setLoading(false);
       }
     };
-
     fetchDashboardData();
   }, []);
 
-  const businessName = profile?.businessName || user?.name || "Provider Workspace";
+  const businessName = profile?.businessName || user?.name || "Provider";
+
+  const statCards = [
+    {
+      label: "Active Services",
+      value: counts.services,
+      icon: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0" />
+        </svg>
+      ),
+      color: "text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/30",
+    },
+    {
+      label: "Scheduled Slots",
+      value: counts.slots,
+      icon: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+        </svg>
+      ),
+      color: "text-accent-600 dark:text-accent-400 bg-accent-50 dark:bg-accent-950/30",
+    },
+    {
+      label: "Appointments Booked",
+      value: counts.bookings,
+      icon: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
+        </svg>
+      ),
+      color: "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30",
+    },
+  ];
+
+  const quickActions = [
+    {
+      title: "Services Management",
+      desc: "Configure your service catalog with pricing and durations.",
+      links: [
+        { to: "/provider/services", label: "View Services" },
+        { to: "/provider/services/create", label: "Add Service", primary: true },
+      ],
+    },
+    {
+      title: "Slots Configuration",
+      desc: "Define dates and time availabilities for your services.",
+      links: [
+        { to: "/provider/slots", label: "View Slots" },
+        { to: "/provider/slots/create", label: "Add Slot", primary: true },
+      ],
+    },
+    {
+      title: "Customer Appointments",
+      desc: "Track client bookings, review notes, and complete sessions.",
+      links: [
+        { to: "/provider/bookings", label: "Manage Appointments", primary: true, fullWidth: true },
+      ],
+      colSpan: true,
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-150 flex flex-col">
-      <Navbar />
-
-      <main className="flex-1 max-w-5xl w-full mx-auto p-6 space-y-6">
-        <PageHeader
-          title="Provider Workspace"
-          subtitle={`Welcome back, ${businessName}`}
-        />
+    <Layout>
+      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6 animate-fade-in">
+        <PageHeader title="Provider Workspace" subtitle={`Welcome back, ${businessName}`} />
 
         {error && (
-          <div className="p-4 text-sm text-red-700 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-xl">
+          <div className="p-4 text-sm text-red-700 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-lg flex items-center gap-2">
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
             {error}
           </div>
         )}
 
         {loading ? (
-          <div className="text-center py-12 text-slate-500 dark:text-zinc-400">
-            Loading workspace statistics...
-          </div>
+          <SkeletonStats />
         ) : (
           <div className="space-y-8">
-            {/* Quick Stats Grid */}
+            {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="bg-white dark:bg-zinc-900 border border-slate-205 dark:border-zinc-850 p-6 rounded-2xl shadow-sm">
-                <span className="text-xs text-slate-400 dark:text-zinc-500 font-bold uppercase tracking-wider">
-                  Active Services
-                </span>
-                <p className="text-4xl font-black text-slate-900 dark:text-zinc-50 mt-1 my-0">
-                  {counts.services}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-zinc-900 border border-slate-205 dark:border-zinc-855 p-6 rounded-2xl shadow-sm">
-                <span className="text-xs text-slate-400 dark:text-zinc-500 font-bold uppercase tracking-wider">
-                  Scheduled Slots
-                </span>
-                <p className="text-4xl font-black text-slate-900 dark:text-zinc-50 mt-1 my-0">
-                  {counts.slots}
-                </p>
-              </div>
-              <div className="bg-white dark:bg-zinc-900 border border-slate-205 dark:border-zinc-855 p-6 rounded-2xl shadow-sm">
-                <span className="text-xs text-slate-400 dark:text-zinc-500 font-bold uppercase tracking-wider">
-                  Appointments Booked
-                </span>
-                <p className="text-4xl font-black text-slate-900 dark:text-zinc-50 mt-1 my-0">
-                  {counts.bookings}
-                </p>
-              </div>
+              {statCards.map((stat) => (
+                <div key={stat.label} className="card p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">{stat.label}</span>
+                    <div className={`w-9 h-9 rounded-lg ${stat.color} flex items-center justify-center`}>
+                      {stat.icon}
+                    </div>
+                  </div>
+                  <p className="text-3xl font-bold text-slate-900 dark:text-zinc-50">{stat.value}</p>
+                </div>
+              ))}
             </div>
 
-            {/* Quick Actions Grid */}
-            <div className="space-y-4">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-zinc-100 my-0">
-                Workspace Operations
-              </h2>
+            {/* Quick Actions */}
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-100 mb-4">Workspace Operations</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Services Card */}
-                <div className="bg-white dark:bg-zinc-900 border border-slate-205 dark:border-zinc-855 p-6 rounded-2xl flex flex-col justify-between gap-4">
-                  <div className="space-y-1">
-                    <h3 className="text-md font-bold text-slate-900 dark:text-zinc-100 my-0">
-                      Services Management
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
-                      Configure and list service catalog details, pricing and durations.
-                    </p>
+                {quickActions.map((action) => (
+                  <div key={action.title} className={`card p-6 flex flex-col justify-between gap-4 ${action.colSpan ? "md:col-span-2" : ""}`}>
+                    <div className="space-y-1">
+                      <h3 className="text-base font-semibold text-slate-900 dark:text-zinc-100">{action.title}</h3>
+                      <p className="text-sm text-slate-500 dark:text-zinc-400 leading-relaxed">{action.desc}</p>
+                    </div>
+                    <div className="flex gap-3">
+                      {action.links.map((link) => (
+                        <Link
+                          key={link.to}
+                          to={link.to}
+                          className={link.primary
+                            ? "btn-primary text-xs"
+                            : "btn-secondary text-xs"}
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Link
-                      to="/provider/services"
-                      className="px-4 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-750 rounded-lg no-underline transition-colors"
-                    >
-                      View Services
-                    </Link>
-                    <Link
-                      to="/provider/services/create"
-                      className="px-4 py-2 text-xs font-bold text-white bg-violet-650 hover:bg-violet-700 rounded-lg no-underline transition-colors shadow-sm shadow-violet-500/10"
-                    >
-                      Add Service
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Slots Card */}
-                <div className="bg-white dark:bg-zinc-900 border border-slate-205 dark:border-zinc-855 p-6 rounded-2xl flex flex-col justify-between gap-4">
-                  <div className="space-y-1">
-                    <h3 className="text-md font-bold text-slate-900 dark:text-zinc-100 my-0">
-                      Slots Configuration
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
-                      Define dates and time availabilities for your services.
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Link
-                      to="/provider/slots"
-                      className="px-4 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-750 rounded-lg no-underline transition-colors"
-                    >
-                      View Slots
-                    </Link>
-                    <Link
-                      to="/provider/slots/create"
-                      className="px-4 py-2 text-xs font-bold text-white bg-violet-650 hover:bg-violet-700 rounded-lg no-underline transition-colors shadow-sm shadow-violet-500/10"
-                    >
-                      Add Slot
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Bookings Card */}
-                <div className="bg-white dark:bg-zinc-900 border border-slate-205 dark:border-zinc-855 p-6 rounded-2xl flex flex-col justify-between gap-4 md:col-span-2">
-                  <div className="space-y-1">
-                    <h3 className="text-md font-bold text-slate-900 dark:text-zinc-100 my-0">
-                      Customer Appointments Tracker
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
-                      Track active client bookings, view instruction notes, and mark completed sessions.
-                    </p>
-                  </div>
-                  <div>
-                    <Link
-                      to="/provider/bookings"
-                      className="inline-block px-4 py-2.5 text-xs font-bold text-white bg-violet-605 hover:bg-violet-700 rounded-lg no-underline transition-colors shadow-sm shadow-violet-500/10"
-                    >
-                      Manage Appointments
-                    </Link>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
         )}
       </main>
-    </div>
+    </Layout>
   );
 };
 
