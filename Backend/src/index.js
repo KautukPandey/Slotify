@@ -4,6 +4,7 @@ import slotRoutes from "./routes/slot.routes.js"
 import providerRoutes from "./routes/provider.routes.js"
 import serviceRoutes from "./routes/service.routes.js"
 import bookingRoutes from "./routes/bookings.routes.js"
+import reviewRoutes from "./routes/review.routes.js"
 import { connectDB } from "./db/db.js"
 import cors from "cors";
 import dotenv from "dotenv"
@@ -19,8 +20,9 @@ app.use("/api", slotRoutes)
 app.use("/api", providerRoutes)
 app.use("/api",serviceRoutes)
 app.use("/api",bookingRoutes)
+app.use("/api",reviewRoutes)
 
 app.listen(PORT,()=>{
-    console.log(`Server running on ${PORT}`);
+    console.log(`Server running on ${PORT}`);   
     
 })

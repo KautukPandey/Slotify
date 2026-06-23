@@ -4,34 +4,70 @@ import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
 import { SkeletonProfile, SkeletonCard } from "../components/LoadingSpinner";
 import providerService from "../services/providerService";
+import reviewService from "../services/reviewService";
 import { extractErrorMessage } from "../services/api";
 
 const ProviderDetails = () => {
   const { id } = useParams();
   const [provider, setProvider] = useState(null);
   const [services, setServices] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setReviewsLoading(true);
       setError(null);
       try {
-        const [providerData, servicesData] = await Promise.all([
+        const [providerData, servicesData, reviewsData] = await Promise.all([
           providerService.getProviderById(id),
           providerService.getProviderServices(id),
+          reviewService.getProviderReviews(id),
         ]);
         setProvider(providerData.provider);
         setServices(servicesData.services || []);
+        setAverageRating(providerData.averageRating || reviewsData.averageRating || 0);
+        setReviewCount(
+          providerData.reviewCount !== undefined
+            ? providerData.reviewCount
+            : (reviewsData.reviewCount || 0)
+        );
+        setReviews(reviewsData.reviews || []);
       } catch (err) {
         setError(extractErrorMessage(err));
       } finally {
         setLoading(false);
+        setReviewsLoading(false);
       }
     };
     fetchData();
   }, [id]);
+
+  const formatReviewDate = (dateStr) => {
+    if (!dateStr) return "N/A";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(undefined, {
+      year: "numeric", month: "short", day: "numeric",
+    });
+  };
+
+  const renderStars = (rating) => {
+    return Array.from({ length: 5 }).map((_, i) => (
+      <svg
+        key={i}
+        className={`w-4.5 h-4.5 shrink-0 ${i < rating ? "text-amber-400 fill-amber-400" : "text-slate-300 dark:text-zinc-700"}`}
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+      </svg>
+    ));
+  };
 
   const providerName = provider?.businessName || "Provider Profile";
 
@@ -68,14 +104,24 @@ const ProviderDetails = () => {
                   {provider.businessName.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-zinc-100">{provider.businessName}</h3>
-                  <span className="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-zinc-400">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                    </svg>
-                    {provider.city}
-                  </span>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-zinc-100 capitalize">{provider.businessName}</h3>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
+                    <span className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-zinc-400">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                      </svg>
+                      {provider.city}
+                    </span>
+                    <span className="text-slate-300 dark:text-zinc-700 text-xs">|</span>
+                    <span className="inline-flex items-center gap-1 text-xs text-amber-500 font-medium">
+                      <svg className="w-3.5 h-3.5 fill-amber-400 text-amber-400 animate-pulse" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                      <span className="font-semibold">{reviewCount > 0 ? averageRating : "0.0"}</span>
+                      <span className="text-slate-400 dark:text-zinc-500">({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})</span>
+                    </span>
+                  </div>
                 </div>
               </div>
               <h4 className="text-sm font-semibold text-slate-700 dark:text-zinc-300 mb-2">About</h4>
@@ -135,6 +181,59 @@ const ProviderDetails = () => {
                           </svg>
                         </Link>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Reviews Section */}
+            <div className="border-t border-slate-200 dark:border-zinc-800 pt-8 mt-8">
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-zinc-50">Customer Reviews</h2>
+                <p className="text-sm text-slate-500 dark:text-zinc-400">See what other customers say about their experiences</p>
+              </div>
+
+              {reviewsLoading ? (
+                <div className="space-y-4">
+                  <SkeletonCard count={1} />
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className="card p-8 text-center text-slate-500 dark:text-zinc-400">
+                  <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-6 h-6 text-slate-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499c.173-.434.768-.434.94 0l1.24 3.109a1 1 0 00.758.625l3.37.24c.477.034.667.618.308.932l-2.51 2.19a1 1 0 00-.307.943l.73 3.32c.104.474-.413.849-.817.587l-2.91-1.892a1 1 0 00-1.062 0l-2.91 1.892c-.404.262-.921-.113-.817-.587l.73-3.32a1 1 0 00-.307-.943l-2.51-2.19c-.359-.314-.169-.898.308-.932l3.37-.24a1 1 0 00.758-.625l1.24-3.11z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm">No reviews yet for this provider.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((review) => (
+                    <div key={review._id} className="card p-5 space-y-3 animate-fade-in">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center text-slate-700 dark:text-zinc-300 font-semibold text-sm capitalize shrink-0">
+                            {(review.customer?.name || "C").charAt(0)}
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-semibold text-slate-900 dark:text-zinc-100 capitalize">
+                              {review.customer?.name || "Anonymous Customer"}
+                            </h4>
+                            <p className="text-[11px] text-slate-400 dark:text-zinc-500">
+                              Reviewed on {formatReviewDate(review.createdAt)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-0.5 shrink-0">
+                          {renderStars(review.rating)}
+                        </div>
+                      </div>
+                      {review.comment && (
+                        <p className="text-sm text-slate-600 dark:text-zinc-400 whitespace-pre-line leading-relaxed pl-1">
+                          {review.comment}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>

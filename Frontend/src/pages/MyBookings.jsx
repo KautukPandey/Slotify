@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
 import { SkeletonCard } from "../components/LoadingSpinner";
 import bookingService from "../services/bookingService";
+import reviewService from "../services/reviewService";
 import { extractErrorMessage } from "../services/api";
 
 const MyBookings = () => {
@@ -12,6 +13,15 @@ const MyBookings = () => {
   const [error, setError] = useState(null);
   const [cancellingIds, setCancellingIds] = useState(new Set());
   const [actionError, setActionError] = useState(null);
+
+  // Review Modal States
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [rating, setRating] = useState(5);
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState(null);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -45,6 +55,43 @@ const MyBookings = () => {
       setActionError(extractErrorMessage(err));
     } finally {
       setCancellingIds((prev) => { const next = new Set(prev); next.delete(bookingId); return next; });
+    }
+  };
+
+  const openReviewModal = (booking) => {
+    setSelectedBooking(booking);
+    setRating(5);
+    setComment("");
+    setReviewError(null);
+    setShowReviewModal(true);
+  };
+
+  const closeReviewModal = () => {
+    setShowReviewModal(false);
+    setSelectedBooking(null);
+    setRating(5);
+    setComment("");
+    setReviewError(null);
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedBooking) return;
+    setSubmittingReview(true);
+    setReviewError(null);
+    try {
+      await reviewService.createReview(selectedBooking._id, rating, comment);
+      
+      // Update local booking isReviewed state immediately
+      setBookings((prev) =>
+        prev.map((b) => (b._id === selectedBooking._id ? { ...b, isReviewed: true } : b))
+      );
+      
+      closeReviewModal();
+    } catch (err) {
+      setReviewError(extractErrorMessage(err));
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
@@ -172,11 +219,147 @@ const MyBookings = () => {
                           )}
                         </button>
                       )}
+                      {booking.status === "completed" && (
+                        booking.isReviewed ? (
+                          <button
+                            disabled={true}
+                            className="btn-secondary text-xs opacity-60 cursor-not-allowed flex items-center gap-1.5"
+                          >
+                            <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Review Submitted
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => openReviewModal(booking)}
+                            className="btn-primary text-xs bg-brand-600 hover:bg-brand-700 text-white"
+                          >
+                            Leave Review
+                          </button>
+                        )
+                      )}
                     </div>
                   </div>
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Review Submission Modal */}
+        {showReviewModal && selectedBooking && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-xs animate-fade-in">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-slate-200 dark:border-zinc-800 w-full max-w-md overflow-hidden animate-scale-in">
+              <div className="p-6 border-b border-slate-100 dark:border-zinc-800 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100">Leave a Review</h3>
+                <button
+                  onClick={closeReviewModal}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={handleReviewSubmit} className="p-6 space-y-5">
+                {reviewError && (
+                  <div className="p-3 text-xs text-red-700 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-lg flex items-center gap-2">
+                    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    {reviewError}
+                  </div>
+                )}
+
+                {/* Booking Info Mini-Card */}
+                <div className="bg-slate-50 dark:bg-zinc-800/40 p-4 rounded-xl space-y-1 text-xs">
+                  <p className="font-semibold text-slate-700 dark:text-zinc-300">
+                    {selectedBooking.service?.name || "Service"}
+                  </p>
+                  <p className="text-slate-500 dark:text-zinc-400">
+                    Provider: <span className="font-medium text-slate-700 dark:text-zinc-300">{selectedBooking.provider?.businessName}</span>
+                  </p>
+                </div>
+
+                {/* Star Rating Selector */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-400 text-center">
+                    Tap to Rate (1-5 Stars)
+                  </label>
+                  <div className="flex items-center justify-center gap-2">
+                    {[1, 2, 3, 4, 5].map((starValue) => {
+                      const isLit = hoveredRating ? starValue <= hoveredRating : starValue <= rating;
+                      return (
+                        <button
+                          key={starValue}
+                          type="button"
+                          onClick={() => setRating(starValue)}
+                          onMouseEnter={() => setHoveredRating(starValue)}
+                          onMouseLeave={() => setHoveredRating(0)}
+                          className="p-1 focus:outline-none transition-transform active:scale-95 cursor-pointer"
+                        >
+                          <svg
+                            className={`w-9 h-9 transition-colors ${
+                              isLit ? "text-amber-400 fill-amber-400 animate-scale-in" : "text-slate-300 dark:text-zinc-700"
+                            }`}
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Comment Textarea */}
+                <div className="space-y-1.5">
+                  <label htmlFor="review-comment" className="text-xs font-semibold text-slate-600 dark:text-zinc-400">
+                    Your Comment (Optional)
+                  </label>
+                  <textarea
+                    id="review-comment"
+                    rows="4"
+                    placeholder="Share details of your experience with this provider..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    className="input resize-none"
+                  />
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-2 justify-end">
+                  <button
+                    type="button"
+                    onClick={closeReviewModal}
+                    disabled={submittingReview}
+                    className="btn-secondary text-xs px-4"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submittingReview}
+                    className="btn-primary text-xs px-5 bg-brand-600 hover:bg-brand-700 text-white flex items-center gap-2"
+                  >
+                    {submittingReview ? (
+                      <>
+                        <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Submitting...
+                      </>
+                    ) : (
+                      "Submit Review"
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </main>

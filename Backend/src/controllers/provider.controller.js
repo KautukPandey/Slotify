@@ -1,4 +1,5 @@
 import Provider from "../models/provider.model.js";
+import Review from "../models/review.model.js";
 
 export const createProfile = async(req,res) => {
     try {
@@ -75,10 +76,30 @@ export const getProviderById = async(req,res) => {
             return res.status(404).json({message:"Provider doesn't exists"})
         }
 
+        const reviews = await Review.find({
+            provider: provider._id
+        });
+
+        const reviewCount = reviews.length;
+
+        let totalRating = 0;
+
+        for (const review of reviews) {
+            totalRating += review.rating;
+        }
+
+        const averageRating =
+            reviewCount > 0
+                ? Number((totalRating / reviewCount).toFixed(1))
+                : 0;
+
         return res.status(200).json({
             message: "Provider profile",
-            provider
-        })
+            provider,
+            averageRating,
+            reviewCount
+        });
+
 
     } catch (error) {
         console.log(error);

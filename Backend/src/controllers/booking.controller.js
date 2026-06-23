@@ -1,5 +1,6 @@
 import Booking from "../models/booking.model.js";
-import Slot from "../models/slot.model.js"
+import Slot from "../models/slot.model.js";
+import Review from "../models/review.model.js";
 
 export const createBooking = async(req,res) => {
     try {
@@ -66,13 +67,22 @@ export const getMyBookings = async(req,res) => {
         })
         .populate("service","name")
         .populate("provider","businessName")
-        .populate("slot","date time")
+        .populate("slot","date time");
         
+        // Fetch all reviews written by this customer to attach isReviewed flags
+        const reviews = await Review.find({ customer: req.user._id });
+        const reviewedBookingIds = new Set(reviews.map((r) => r.booking.toString()));
+
+        const myBookingsWithReviewInfo = myBookings.map((booking) => {
+            const bookingObj = booking.toObject();
+            bookingObj.isReviewed = reviewedBookingIds.has(booking._id.toString());
+            return bookingObj;
+        });
 
         return res.status(200).json({
             message: "My Bookings fetched",
-            myBookings
-        })
+            myBookings: myBookingsWithReviewInfo
+        });
 
     } catch (error) {
         console.log(error);
