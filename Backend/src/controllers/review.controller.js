@@ -89,3 +89,16 @@ export const getProviderReviews = async (req, res) => {
     return res.status(500).json({ message: "Error while getting reviews" });
   }
 };
+
+export const getMyReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find({ customer: req.user._id });
+    return res.status(200).json({
+      message: "My reviews fetched",
+      reviews,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error while getting my reviews" });
+  }
+};

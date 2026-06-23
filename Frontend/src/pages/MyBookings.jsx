@@ -27,8 +27,21 @@ const MyBookings = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await bookingService.getMyBookings();
-      const sorted = (data.myBookings || []).sort((a, b) => {
+      const [bookingsData, reviewsData] = await Promise.all([
+        bookingService.getMyBookings(),
+        reviewService.getMyReviews()
+      ]);
+      
+      const reviewedBookingIds = new Set(
+        (reviewsData.reviews || []).map((r) => r.booking)
+      );
+
+      const bookingsWithReviews = (bookingsData.myBookings || []).map((b) => ({
+        ...b,
+        isReviewed: reviewedBookingIds.has(b._id)
+      }));
+
+      const sorted = bookingsWithReviews.sort((a, b) => {
         const dateA = a.slot?.date ? new Date(a.slot.date) : new Date(0);
         const dateB = b.slot?.date ? new Date(b.slot.date) : new Date(0);
         return dateB - dateA;

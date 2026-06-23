@@ -69,19 +69,9 @@ export const getMyBookings = async(req,res) => {
         .populate("provider","businessName")
         .populate("slot","date time");
         
-        // Fetch all reviews written by this customer to attach isReviewed flags
-        const reviews = await Review.find({ customer: req.user._id });
-        const reviewedBookingIds = new Set(reviews.map((r) => r.booking.toString()));
-
-        const myBookingsWithReviewInfo = myBookings.map((booking) => {
-            const bookingObj = booking.toObject();
-            bookingObj.isReviewed = reviewedBookingIds.has(booking._id.toString());
-            return bookingObj;
-        });
-
         return res.status(200).json({
             message: "My Bookings fetched",
-            myBookings: myBookingsWithReviewInfo
+            myBookings
         });
 
     } catch (error) {

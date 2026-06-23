@@ -29,6 +29,15 @@ const reviewService = {
     const response = await api.get(`/reviews/provider/${providerId}`);
     return response.data;
   },
+
+  /**
+   * Fetch all reviews by the current user
+   * @returns {Promise<object>} Response containing the user's reviews
+   */
+  getMyReviews: async () => {
+    const response = await api.get("/reviews/my");
+    return response.data;
+  },
 };
 
 export default reviewService;
