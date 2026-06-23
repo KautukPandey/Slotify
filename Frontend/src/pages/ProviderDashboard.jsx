@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
-import PageHeader from "../components/PageHeader";
 import { SkeletonStats } from "../components/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
 import providerDashboardService from "../services/providerDashboardService";
@@ -49,6 +48,10 @@ const ProviderDashboard = () => {
 
   const businessName = profile?.businessName || user?.name || "Provider";
 
+  const today = new Date().toLocaleDateString(undefined, {
+    weekday: "long", year: "numeric", month: "long", day: "numeric",
+  });
+
   const statCards = [
     {
       label: "Active Services",
@@ -71,7 +74,7 @@ const ProviderDashboard = () => {
       color: "text-accent-600 dark:text-accent-400 bg-accent-50 dark:bg-accent-950/30",
     },
     {
-      label: "Appointments Booked",
+      label: "Total Bookings",
       value: counts.bookings,
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
@@ -103,7 +106,7 @@ const ProviderDashboard = () => {
       title: "Customer Appointments",
       desc: "Track client bookings, review notes, and complete sessions.",
       links: [
-        { to: "/provider/bookings", label: "Manage Appointments", primary: true, fullWidth: true },
+        { to: "/provider/bookings", label: "Manage Appointments", primary: true },
       ],
       colSpan: true,
     },
@@ -111,8 +114,14 @@ const ProviderDashboard = () => {
 
   return (
     <Layout>
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6 animate-fade-in">
-        <PageHeader title="Provider Workspace" subtitle={`Welcome back, ${businessName}`} />
+      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-8 animate-fade-in">
+        {/* Header */}
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-[30px] font-semibold text-slate-900 dark:text-slate-50 tracking-tight leading-tight">
+            Welcome back, {businessName}
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{today}</p>
+        </div>
 
         {error && (
           <div className="p-4 text-sm text-red-700 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-lg flex items-center gap-2">
@@ -126,31 +135,31 @@ const ProviderDashboard = () => {
         {loading ? (
           <SkeletonStats />
         ) : (
-          <div className="space-y-8">
+          <>
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {statCards.map((stat) => (
-                <div key={stat.label} className="card p-6">
+                <div key={stat.label} className="card p-5">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">{stat.label}</span>
+                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{stat.label}</span>
                     <div className={`w-9 h-9 rounded-lg ${stat.color} flex items-center justify-center`}>
                       {stat.icon}
                     </div>
                   </div>
-                  <p className="text-3xl font-bold text-slate-900 dark:text-zinc-50">{stat.value}</p>
+                  <p className="text-3xl font-bold text-slate-900 dark:text-slate-50">{stat.value}</p>
                 </div>
               ))}
             </div>
 
             {/* Quick Actions */}
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-100 mb-4">Workspace Operations</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">Workspace</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {quickActions.map((action) => (
-                  <div key={action.title} className={`card p-6 flex flex-col justify-between gap-4 ${action.colSpan ? "md:col-span-2" : ""}`}>
+                  <div key={action.title} className={`card p-5 flex flex-col justify-between gap-4 ${action.colSpan ? "md:col-span-2" : ""}`}>
                     <div className="space-y-1">
-                      <h3 className="text-base font-semibold text-slate-900 dark:text-zinc-100">{action.title}</h3>
-                      <p className="text-sm text-slate-500 dark:text-zinc-400 leading-relaxed">{action.desc}</p>
+                      <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{action.title}</h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{action.desc}</p>
                     </div>
                     <div className="flex gap-3">
                       {action.links.map((link) => (
@@ -158,8 +167,8 @@ const ProviderDashboard = () => {
                           key={link.to}
                           to={link.to}
                           className={link.primary
-                            ? "btn-primary text-xs"
-                            : "btn-secondary text-xs"}
+                            ? "btn-primary text-sm"
+                            : "btn-secondary text-sm"}
                         >
                           {link.label}
                         </Link>
@@ -169,7 +178,7 @@ const ProviderDashboard = () => {
                 ))}
               </div>
             </div>
-          </div>
+          </>
         )}
       </main>
     </Layout>

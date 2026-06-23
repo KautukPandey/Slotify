@@ -17,6 +17,7 @@ const ProviderDetails = () => {
   const [reviewCount, setReviewCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("services");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,7 +61,7 @@ const ProviderDetails = () => {
     return Array.from({ length: 5 }).map((_, i) => (
       <svg
         key={i}
-        className={`w-4.5 h-4.5 shrink-0 ${i < rating ? "text-amber-400 fill-amber-400" : "text-slate-300 dark:text-zinc-700"}`}
+        className={`w-4 h-4 shrink-0 ${i < rating ? "text-amber-400 fill-amber-400" : "text-slate-200 dark:text-slate-700"}`}
         viewBox="0 0 20 20"
         fill="currentColor"
       >
@@ -69,12 +70,22 @@ const ProviderDetails = () => {
     ));
   };
 
+  const lowestPrice = services.length > 0
+    ? Math.min(...services.map(s => s.price))
+    : null;
+
   const providerName = provider?.businessName || "Provider Profile";
+
+  const tabs = [
+    { id: "services", label: "Services" },
+    { id: "reviews", label: "Reviews" },
+    { id: "about", label: "About" },
+  ];
 
   return (
     <Layout>
-      <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 animate-fade-in">
-        <PageHeader title={providerName} subtitle={provider ? `Located in ${provider.city}` : ""} showBack={true} />
+      <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 animate-fade-in">
+        <PageHeader showBack={true} />
 
         {error && (
           <div className="p-4 mb-6 text-sm text-red-700 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-lg flex items-center gap-2">
@@ -92,152 +103,209 @@ const ProviderDetails = () => {
           </div>
         ) : !provider ? (
           <div className="card p-12 text-center">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-zinc-100 mb-1">Provider not found</h3>
-            <p className="text-sm text-slate-500 dark:text-zinc-400">The provider you're looking for doesn't exist.</p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">Provider not found</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">The provider you're looking for doesn't exist.</p>
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Provider Bio */}
-            <div className="card p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-500 to-accent-600 flex items-center justify-center text-white font-bold text-lg">
-                  {provider.businessName.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-zinc-100 capitalize">{provider.businessName}</h3>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
-                    <span className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-zinc-400">
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                      </svg>
-                      {provider.city}
-                    </span>
-                    <span className="text-slate-300 dark:text-zinc-700 text-xs">|</span>
-                    <span className="inline-flex items-center gap-1 text-xs text-amber-500 font-medium">
-                      <svg className="w-3.5 h-3.5 fill-amber-400 text-amber-400 animate-pulse" viewBox="0 0 20 20" fill="currentColor">
+            {/* Provider Profile Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-brand-600 flex items-center justify-center text-white font-bold text-2xl shrink-0">
+                {provider.businessName.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-50 capitalize tracking-tight">
+                  {provider.businessName}
+                </h1>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
+                  {reviewCount > 0 && (
+                    <span className="inline-flex items-center gap-1 text-sm">
+                      <svg className="w-4 h-4 fill-amber-400 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
-                      <span className="font-semibold">{reviewCount > 0 ? averageRating : "0.0"}</span>
-                      <span className="text-slate-400 dark:text-zinc-500">({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})</span>
+                      <span className="font-semibold text-slate-900 dark:text-slate-100">{averageRating}</span>
+                      <span className="text-slate-400">·</span>
+                      <span className="text-slate-500 dark:text-slate-400">{reviewCount} {reviewCount === 1 ? 'Review' : 'Reviews'}</span>
                     </span>
-                  </div>
+                  )}
+                  <span className="text-slate-400 dark:text-slate-600">·</span>
+                  <span className="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                    </svg>
+                    {provider.city}
+                  </span>
                 </div>
               </div>
-              <h4 className="text-sm font-semibold text-slate-700 dark:text-zinc-300 mb-2">About</h4>
-              <p className="text-sm text-slate-600 dark:text-zinc-400 whitespace-pre-line leading-relaxed">
-                {provider.description}
-              </p>
             </div>
 
-            {/* Services */}
-            <div>
-              <div className="mb-4">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-zinc-50">Services Offered</h2>
-                <p className="text-sm text-slate-500 dark:text-zinc-400">Select a service to view available time slots</p>
-              </div>
-
-              {services.length === 0 ? (
-                <div className="card p-12 text-center">
-                  <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-zinc-100 mb-1">No services available</h3>
-                  <p className="text-sm text-slate-500 dark:text-zinc-400">This provider hasn't added any services yet.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {services.map((service) => (
-                    <div key={service._id} className="card-hover p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex-1 space-y-1.5">
-                        <h3 className="text-base font-semibold text-slate-900 dark:text-zinc-100 capitalize">
-                          {service.name}
-                        </h3>
-                        <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-zinc-400">
-                          <span className="inline-flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {service.duration} mins
-                          </span>
-                        </div>
-                        <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">
-                          {service.description}
-                        </p>
-                      </div>
-                      <div className="flex items-center justify-between sm:flex-col sm:items-end gap-3 shrink-0">
-                        <span className="text-2xl font-bold text-slate-900 dark:text-zinc-50">
-                          ${service.price.toFixed(2)}
-                        </span>
-                        <Link
-                          to={`/services/${service._id}/slots`}
-                          className="btn-primary text-xs"
-                        >
-                          Book Slot
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                          </svg>
-                        </Link>
-                      </div>
-                    </div>
+            {/* Tab Navigation + Content */}
+            <div className="flex flex-col lg:flex-row gap-8">
+              {/* Left Column */}
+              <div className="flex-1 min-w-0">
+                {/* Tabs */}
+                <div className="flex gap-6 border-b border-slate-200 dark:border-slate-800 mb-6">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`pb-3 text-sm font-medium border-b-2 transition-colors cursor-pointer bg-transparent px-0 ${
+                        activeTab === tab.id
+                          ? "border-brand-600 text-brand-700 dark:text-brand-400"
+                          : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
                   ))}
                 </div>
-              )}
-            </div>
 
-            {/* Reviews Section */}
-            <div className="border-t border-slate-200 dark:border-zinc-800 pt-8 mt-8">
-              <div className="mb-6">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-zinc-50">Customer Reviews</h2>
-                <p className="text-sm text-slate-500 dark:text-zinc-400">See what other customers say about their experiences</p>
+                {/* Services Tab */}
+                {activeTab === "services" && (
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Available Services</h2>
+                    {services.length === 0 ? (
+                      <div className="card p-8 text-center">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">This provider hasn't added any services yet.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {services.map((service) => (
+                          <div key={service._id} className="card p-5 sm:p-6">
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                              <div className="flex-1 space-y-2">
+                                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 capitalize">
+                                  {service.name}
+                                </h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                                  {service.description}
+                                </p>
+                                <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                                  <span className="inline-flex items-center gap-1">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    {service.duration} min
+                                  </span>
+                                  <span className="font-semibold text-slate-900 dark:text-slate-100">${service.price.toFixed(2)}</span>
+                                </div>
+                              </div>
+                              <Link
+                                to={`/services/${service._id}/slots`}
+                                className="btn-primary text-sm shrink-0"
+                              >
+                                Book Now
+                              </Link>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Reviews Tab */}
+                {activeTab === "reviews" && (
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Customer Reviews</h2>
+                    {reviewsLoading ? (
+                      <SkeletonCard count={1} />
+                    ) : reviews.length === 0 ? (
+                      <div className="card p-8 text-center">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">No reviews yet for this provider.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {reviews.map((review) => (
+                          <div key={review._id} className="card p-5 space-y-3">
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-semibold text-sm capitalize shrink-0">
+                                  {(review.customer?.name || "C").charAt(0)}
+                                </div>
+                                <div>
+                                  <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 capitalize">
+                                    {review.customer?.name || "Anonymous Customer"}
+                                  </h4>
+                                  <p className="text-xs text-slate-400 dark:text-slate-500">
+                                    {formatReviewDate(review.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-0.5 shrink-0">
+                                {renderStars(review.rating)}
+                              </div>
+                            </div>
+                            {review.comment && (
+                              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-1">
+                                {review.comment}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* About Tab */}
+                {activeTab === "about" && (
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">About</h2>
+                    <div className="card p-6">
+                      <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line leading-relaxed">
+                        {provider.description}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {reviewsLoading ? (
-                <div className="space-y-4">
-                  <SkeletonCard count={1} />
-                </div>
-              ) : reviews.length === 0 ? (
-                <div className="card p-8 text-center text-slate-500 dark:text-zinc-400">
-                  <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-3">
-                    <svg className="w-6 h-6 text-slate-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499c.173-.434.768-.434.94 0l1.24 3.109a1 1 0 00.758.625l3.37.24c.477.034.667.618.308.932l-2.51 2.19a1 1 0 00-.307.943l.73 3.32c.104.474-.413.849-.817.587l-2.91-1.892a1 1 0 00-1.062 0l-2.91 1.892c-.404.262-.921-.113-.817-.587l.73-3.32a1 1 0 00-.307-.943l-2.51-2.19c-.359-.314-.169-.898.308-.932l3.37-.24a1 1 0 00.758-.625l1.24-3.11z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm">No reviews yet for this provider.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {reviews.map((review) => (
-                    <div key={review._id} className="card p-5 space-y-3 animate-fade-in">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center text-slate-700 dark:text-zinc-300 font-semibold text-sm capitalize shrink-0">
-                            {(review.customer?.name || "C").charAt(0)}
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-semibold text-slate-900 dark:text-zinc-100 capitalize">
-                              {review.customer?.name || "Anonymous Customer"}
-                            </h4>
-                            <p className="text-[11px] text-slate-400 dark:text-zinc-500">
-                              Reviewed on {formatReviewDate(review.createdAt)}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-0.5 shrink-0">
-                          {renderStars(review.rating)}
-                        </div>
-                      </div>
-                      {review.comment && (
-                        <p className="text-sm text-slate-600 dark:text-zinc-400 whitespace-pre-line leading-relaxed pl-1">
-                          {review.comment}
-                        </p>
-                      )}
+              {/* Right Sidebar (Desktop) */}
+              <div className="lg:w-80 shrink-0">
+                <div className="card p-6 space-y-5 lg:sticky lg:top-24">
+                  {lowestPrice !== null && (
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Starts From</p>
+                      <p className="text-3xl font-bold text-slate-900 dark:text-slate-50 mt-1">
+                        ${lowestPrice.toFixed(2)} <span className="text-sm font-normal text-slate-400">/ service</span>
+                      </p>
                     </div>
-                  ))}
+                  )}
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                      <svg className="w-5 h-5 text-brand-600 dark:text-brand-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                      </svg>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Verified Provider</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Background checked</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                      <svg className="w-5 h-5 text-brand-600 dark:text-brand-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                      </svg>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Instant Booking</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Confirm in seconds</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {services.length > 0 && (
+                    <Link
+                      to={`/services/${services[0]._id}/slots`}
+                      className="btn-primary w-full justify-center py-3 text-base"
+                    >
+                      Book Now
+                    </Link>
+                  )}
+                  <p className="text-xs text-center text-slate-400 dark:text-slate-500">You won't be charged yet</p>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         )}
