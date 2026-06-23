@@ -17,11 +17,11 @@ export const SkeletonCard = ({ count = 1 }) => (
 
 export const SkeletonTable = ({ rows = 4 }) => (
   <div className="card overflow-hidden">
-    <div className="p-4 border-b border-slate-200 dark:border-zinc-800">
+    <div className="p-4 border-b border-slate-200 dark:border-slate-800">
       <div className="skeleton h-4 w-1/4" />
     </div>
     {Array.from({ length: rows }).map((_, i) => (
-      <div key={i} className="p-4 border-b border-slate-100 dark:border-zinc-800/50 last:border-0">
+      <div key={i} className="p-4 border-b border-slate-100 dark:border-slate-800/50 last:border-0">
         <div className="flex gap-4">
           <div className="skeleton h-4 w-1/3" />
           <div className="skeleton h-4 w-1/4" />
@@ -64,11 +64,11 @@ const LoadingSpinner = ({ message = "Loading details..." }) => {
   return (
     <div className="flex flex-col items-center justify-center p-12 min-h-[300px]">
       <div className="relative flex items-center justify-center">
-        <div className="w-10 h-10 rounded-full border-2 border-slate-200 dark:border-zinc-700" />
+        <div className="w-10 h-10 rounded-full border-2 border-slate-200 dark:border-slate-700" />
         <div className="absolute w-10 h-10 rounded-full border-2 border-t-brand-600 dark:border-t-brand-400 animate-spin" />
       </div>
       {message && (
-        <p className="mt-4 text-sm text-slate-500 dark:text-zinc-400 animate-pulse font-medium">
+        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 animate-pulse font-medium">
           {message}
         </p>
       )}

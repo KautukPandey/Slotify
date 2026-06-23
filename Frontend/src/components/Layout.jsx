@@ -3,7 +3,7 @@ import Navbar from "./Navbar";
 
 const Layout = ({ children, className = "" }) => {
   return (
-    <div className={`min-h-screen bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-150 flex flex-col ${className}`}>
+    <div className={`min-h-screen bg-[#faf8ff] dark:bg-[#020617] text-slate-800 dark:text-slate-200 flex flex-col ${className}`}>
       <Navbar />
       {children}
     </div>
