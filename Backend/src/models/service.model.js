@@ -30,4 +30,8 @@ const serviceSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
+serviceSchema.index({
+    provider: 1
+})
+
 export default mongoose.model("Service",serviceSchema)

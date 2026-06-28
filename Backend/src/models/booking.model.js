@@ -32,4 +32,13 @@ const bookingSchema = new mongoose.Schema({
     }
 }, { timestamps: true })
 
+bookingSchema.index({
+    customer: 1
+})
+
+bookingSchema.index({
+    provider: 1
+})
+
+
 export default mongoose.model("Booking",bookingSchema)

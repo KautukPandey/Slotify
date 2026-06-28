@@ -29,4 +29,8 @@ const reviewSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
+reviewSchema.index({
+    provider: 1
+})
+
 export default mongoose.model("Review",reviewSchema)

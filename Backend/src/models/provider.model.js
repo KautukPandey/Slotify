@@ -22,4 +22,8 @@ const providerSchema = new mongoose.Schema({
 
 },{timestamps:true})
 
+providerSchema.index({
+    city: 1
+})
+
 export default mongoose.model("Provider",providerSchema)
