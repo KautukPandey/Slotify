@@ -53,6 +53,11 @@ export const createReview = async (req, res) => {
 export const getProviderReviews = async (req, res) => {
   try {
     const { providerId } = req.params;
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || 9
+
+    const skip = (page-1)*limit
+
     if (!providerId) {
       return res.status(400).json({ message: "Provider's Id is required" });
     }
@@ -64,23 +69,41 @@ export const getProviderReviews = async (req, res) => {
       provider: providerId,
     })
       .populate("customer", "name")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
 
-    const reviewCount = reviews.length;
+    
+    const reviewCount = await Review.countDocuments({
+      provider: providerId
+    });
+    const totalPages = Math.ceil(reviewCount / limit);
+    
 
-    let totalRating = 0;
-
-    for (const review of reviews) {
-        totalRating += review.rating;
-    }
+    const ratingStats = await Review.aggregate([
+      {
+        $match: {
+          provider: provider._id
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          averageRating: { $avg: "$rating" }
+        }
+      }
+    ]);
 
     const averageRating =
-        reviewCount > 0
-            ? (totalRating / reviewCount).toFixed(1)
-            : 0;
+      ratingStats.length > 0
+        ? Number(ratingStats[0].averageRating.toFixed(1))
+        : 0;
     return res.status(200).json({
       message: "Reviews fetched",
+      page,
+      limit,
       reviewCount,
+      totalPages,
       averageRating,
       reviews,
     });

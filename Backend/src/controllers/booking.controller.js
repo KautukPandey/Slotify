@@ -62,15 +62,32 @@ export const createBooking = async(req,res) => {
 
 export const getMyBookings = async(req,res) => {
     try {
+        const page = Number(req.query.page) || 1
+        const limit = Number(req.query.limit) || 9
+
+        const skip = (page-1)*limit
+
         const myBookings = await Booking.find({
             customer: req.user._id
         })
         .populate("service","name")
         .populate("provider","businessName")
-        .populate("slot","date time");
+        .populate("slot","date time")
+        .sort({createdAt:-1})
+        .skip(skip)
+        .limit(limit)
         
+        const totalBookings = await Booking.countDocuments({
+            customer: req.user._id
+        })
+
+        const totalPages = Math.ceil(totalBookings/limit)
         return res.status(200).json({
             message: "My Bookings fetched",
+            page,
+            limit,
+            totalBookings,
+            totalPages,
             myBookings
         });
 
@@ -113,15 +130,33 @@ export const cancelBooking = async(req,res) => {
 
 export const getProviderBookings = async(req,res) => {
     try {
+        const page = Number(req.query.page) || 1
+        const limit = Number(req.query.limit) || 9
+
+        const skip = (page-1)*limit
+
         const providerBookings = await Booking.find({
             provider: req.provider._id
         })
         .populate("service","name")
         .populate("slot","date time")
         .populate("customer","name email")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+
+        const totalBookings = await Booking.countDocuments({
+            provider: req.provider._id
+        })
+
+        const totalPages = Math.ceil(totalBookings/limit)
 
         return res.status(200).json({
             message: "Provider's bookings fetched",
+            page,
+            limit,
+            totalBookings,
+            totalPages,
             providerBookings
         })
     } catch (error) {

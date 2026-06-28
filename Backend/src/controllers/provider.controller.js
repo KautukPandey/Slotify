@@ -42,7 +42,12 @@ export const createProfile = async(req,res) => {
 
 export const getProviders = async(req,res) => {
     try {
-        let {city,search} = req.query
+        let {city,search,page,limit} = req.query
+        page = Number(req.query.page) || 1
+        limit = Number(req.query.limit) || 9
+
+        const skip = (page-1)*limit
+
         const filter = {}
         if(city){
             city = city.toLowerCase()
@@ -55,11 +60,23 @@ export const getProviders = async(req,res) => {
                 $options: "i"
             }
         }
+
+        const totalProviders = await Provider.countDocuments(filter);
+
+        const totalPages = Math.ceil(totalProviders / limit);
+        
         const providers = await Provider.find(filter)
+                                        .skip(skip)
+                                        .limit(limit)
 
         return res.status(200).json({
             message: "List of providers",
-            providers
+            page,
+            limit,
+            totalPages,
+            totalProviders,
+            providers,
+
         })
     } catch (error) {
         console.log(error);

@@ -156,13 +156,13 @@ const MyBookings = () => {
           <div className="space-y-4"><SkeletonCard count={3} /></div>
         ) : bookings.length === 0 ? (
           <div className="card p-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-zinc-100 mb-1">No bookings yet</h3>
-            <p className="text-sm text-slate-500 dark:text-zinc-400 mb-4">Find a provider and book your first appointment.</p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">No bookings yet</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Find a provider and book your first appointment.</p>
             <Link to="/providers" className="btn-primary">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -184,25 +184,25 @@ const MyBookings = () => {
                         {getStatusBadge(booking.status)}
                       </div>
                       <div>
-                        <h3 className="text-base font-semibold text-slate-900 dark:text-zinc-100 capitalize">
+                        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 capitalize">
                           {booking.service?.name || "Service Unavailable"}
                         </h3>
                       </div>
-                      <div className="text-sm text-slate-600 dark:text-zinc-400 space-y-1">
+                      <div className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
                         <p className="flex items-center gap-2">
                           <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0" />
                           </svg>
-                          <span><span className="font-medium text-slate-500 dark:text-zinc-500">Provider:</span> {booking.provider?.businessName || "N/A"}</span>
+                          <span><span className="font-medium text-slate-500 dark:text-slate-500">Provider:</span> {booking.provider?.businessName || "N/A"}</span>
                         </p>
                         <p className="flex items-center gap-2">
                           <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span><span className="font-medium text-slate-500 dark:text-zinc-500">Schedule:</span> {formatDate(booking.slot?.date)} at {booking.slot?.time || "N/A"}</span>
+                          <span><span className="font-medium text-slate-500 dark:text-slate-500">Schedule:</span> {formatDate(booking.slot?.date)} at {booking.slot?.time || "N/A"}</span>
                         </p>
                         {booking.note && (
-                          <p className="flex items-start gap-2 italic text-slate-500 dark:text-zinc-500 pt-1">
+                          <p className="flex items-start gap-2 italic text-slate-500 dark:text-slate-500 pt-1">
                             <svg className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
                             </svg>
@@ -212,7 +212,7 @@ const MyBookings = () => {
                       </div>
                     </div>
 
-                    <div className="shrink-0">
+                    <div className="shrink-0 mt-4 sm:mt-0 flex sm:flex-col gap-2">
                       {isConfirmed && (
                         <button
                           onClick={() => handleCancelBooking(booking._id)}
@@ -262,13 +262,13 @@ const MyBookings = () => {
 
         {/* Review Submission Modal */}
         {showReviewModal && selectedBooking && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-xs animate-fade-in">
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-slate-200 dark:border-zinc-800 w-full max-w-md overflow-hidden animate-scale-in">
-              <div className="p-6 border-b border-slate-100 dark:border-zinc-800 flex items-center justify-between">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100">Leave a Review</h3>
+          <div className="modal-overlay">
+            <div className="modal-content w-full max-w-md">
+              <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Leave a Review</h3>
                 <button
                   onClick={closeReviewModal}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -287,18 +287,18 @@ const MyBookings = () => {
                 )}
 
                 {/* Booking Info Mini-Card */}
-                <div className="bg-slate-50 dark:bg-zinc-800/40 p-4 rounded-xl space-y-1 text-xs">
-                  <p className="font-semibold text-slate-700 dark:text-zinc-300">
+                <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl space-y-1 text-xs border border-slate-100 dark:border-slate-800">
+                  <p className="font-semibold text-slate-700 dark:text-slate-300">
                     {selectedBooking.service?.name || "Service"}
                   </p>
-                  <p className="text-slate-500 dark:text-zinc-400">
-                    Provider: <span className="font-medium text-slate-700 dark:text-zinc-300">{selectedBooking.provider?.businessName}</span>
+                  <p className="text-slate-500 dark:text-slate-400">
+                    Provider: <span className="font-medium text-slate-700 dark:text-slate-300">{selectedBooking.provider?.businessName}</span>
                   </p>
                 </div>
 
                 {/* Star Rating Selector */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-400 text-center">
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 text-center">
                     Tap to Rate (1-5 Stars)
                   </label>
                   <div className="flex items-center justify-center gap-2">
@@ -311,11 +311,11 @@ const MyBookings = () => {
                           onClick={() => setRating(starValue)}
                           onMouseEnter={() => setHoveredRating(starValue)}
                           onMouseLeave={() => setHoveredRating(0)}
-                          className="p-1 focus:outline-none transition-transform active:scale-95 cursor-pointer"
+                          className="p-1 focus:outline-none transition-transform active:scale-95 cursor-pointer bg-transparent border-none"
                         >
                           <svg
                             className={`w-9 h-9 transition-colors ${
-                              isLit ? "text-amber-400 fill-amber-400 animate-scale-in" : "text-slate-300 dark:text-zinc-700"
+                              isLit ? "text-amber-400 fill-amber-400 animate-scale-in" : "text-slate-200 dark:text-slate-700"
                             }`}
                             viewBox="0 0 20 20"
                             fill="currentColor"
@@ -330,7 +330,7 @@ const MyBookings = () => {
 
                 {/* Comment Textarea */}
                 <div className="space-y-1.5">
-                  <label htmlFor="review-comment" className="text-xs font-semibold text-slate-600 dark:text-zinc-400">
+                  <label htmlFor="review-comment" className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                     Your Comment (Optional)
                   </label>
                   <textarea

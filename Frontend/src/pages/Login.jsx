@@ -50,20 +50,18 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950 p-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid dark:bg-grid-dark pointer-events-none" />
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-brand-200/30 dark:bg-brand-900/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-200/30 dark:bg-accent-900/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen flex items-center justify-center bg-[#faf8ff] dark:bg-[#020617] p-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-grid dark:bg-grid-dark pointer-events-none opacity-50" />
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-brand-200/30 dark:bg-brand-900/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-200/30 dark:bg-accent-900/20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-[420px] card p-8 relative z-10 animate-scale-in">
-        <div className="h-1 w-full bg-gradient-to-r from-brand-500 via-accent-500 to-brand-500 absolute top-0 left-0 rounded-t-2xl" />
-
         <div className="flex flex-col items-center mb-8 pt-2">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-500 to-accent-600 flex items-center justify-center text-white font-bold text-lg shadow-sm shadow-brand-500/20 mb-4">
+          <div className="w-12 h-12 rounded-xl bg-brand-600 flex items-center justify-center text-white font-bold text-xl mb-5">
             S
           </div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">Welcome back</h2>
-          <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">Enter your credentials to access your account</p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">Welcome back</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">Enter your credentials to access your account</p>
         </div>
 
         {successMessage && (
@@ -88,7 +86,7 @@ const Login = () => {
           <div>
             <label htmlFor="email" className="label">Email address</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                 </svg>
@@ -108,7 +106,7 @@ const Login = () => {
           <div>
             <label htmlFor="password" className="label">Password</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                 </svg>
@@ -124,7 +122,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-zinc-300 cursor-pointer bg-transparent border-none"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer bg-transparent border-none"
               >
                 {showPassword ? (
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
@@ -141,7 +139,7 @@ const Login = () => {
             {validationErrors.password && <p className="text-xs text-red-500 dark:text-red-400 mt-1.5 font-medium">{validationErrors.password}</p>}
           </div>
 
-          <button type="submit" disabled={isLoading} className="btn-primary w-full">
+          <button type="submit" disabled={isLoading} className="btn-primary w-full py-2.5">
             {isLoading ? (
               <>
                 <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -156,9 +154,9 @@ const Login = () => {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-500 dark:text-zinc-400">
+        <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
           Don't have an account?{" "}
-          <Link to="/register" className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-500 transition-colors">
+          <Link to="/register" className="font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors">
             Create one
           </Link>
         </p>

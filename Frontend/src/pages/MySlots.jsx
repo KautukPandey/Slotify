@@ -68,13 +68,13 @@ const MySlots = () => {
           <SkeletonTable rows={5} />
         ) : slots.length === 0 ? (
           <div className="card p-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-zinc-100 mb-1">No slots yet</h3>
-            <p className="text-sm text-slate-500 dark:text-zinc-400 mb-4">Create your first time slot to start accepting bookings.</p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">No slots yet</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Create your first time slot to start accepting bookings.</p>
             <Link to="/provider/slots/create" className="btn-primary">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -87,23 +87,23 @@ const MySlots = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="bg-slate-50 dark:bg-zinc-800/50 border-b border-slate-200 dark:border-zinc-700">
-                    <th className="p-4 pl-6 text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Service Name</th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Date</th>
-                    <th className="p-4 pr-6 text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Time</th>
+                  <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                    <th className="p-4 pl-6 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Service Name</th>
+                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Date</th>
+                    <th className="p-4 pr-6 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Time</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/50">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
                   {slots.map((slot) => (
-                    <tr key={slot._id} className="hover:bg-slate-50/50 dark:hover:bg-zinc-800/20 transition-colors">
-                      <td className="p-4 pl-6 font-medium text-slate-900 dark:text-zinc-200 capitalize">
+                    <tr key={slot._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                      <td className="p-4 pl-6 font-medium text-slate-900 dark:text-slate-200 capitalize">
                         {slot.service?.name || "Service Unavailable"}
                       </td>
-                      <td className="p-4 text-slate-600 dark:text-zinc-400">
+                      <td className="p-4 text-slate-600 dark:text-slate-400">
                         {formatDate(slot.date)}
                       </td>
                       <td className="p-4 pr-6">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
