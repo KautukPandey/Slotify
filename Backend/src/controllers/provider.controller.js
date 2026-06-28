@@ -42,7 +42,16 @@ export const createProfile = async(req,res) => {
 
 export const getProviders = async(req,res) => {
     try {
-        let {city,search,page,limit} = req.query
+        let {city,search,page,limit,sort} = req.query
+
+        sort = req.query.sort;
+
+        let sortOption = { createdAt : -1 };
+        if(sort==='name'){
+            sortOption = {businessName : 1}
+        }
+        
+
         page = Number(req.query.page) || 1
         limit = Number(req.query.limit) || 9
 
@@ -66,6 +75,7 @@ export const getProviders = async(req,res) => {
         const totalPages = Math.ceil(totalProviders / limit);
         
         const providers = await Provider.find(filter)
+                                        .sort(sortOption)
                                         .skip(skip)
                                         .limit(limit)
 
