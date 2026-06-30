@@ -3,19 +3,7 @@ import Review from "../models/review.model.js";
 
 export const createProfile = async(req,res) => {
     try {
-        if(req.user.role !== "provider"){
-            return res.status(403).json({
-                message: "Providers only"
-            })
-        }
         let {businessName,city,description} = req.body
-        if(!businessName || !city || !description){
-            return res.status(400).json({message:"Fields cannot be empty"})
-        }
-
-        city = city.trim().toLowerCase()
-        description = description.trim()
-
 
         const existingProvider = await Provider.findOne({user:req.user._id})
         if(existingProvider){
