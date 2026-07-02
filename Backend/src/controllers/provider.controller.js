@@ -32,26 +32,19 @@ export const getProviders = async(req,res) => {
     try {
         let {city,search,page,limit,sort} = req.query
 
-        sort = req.query.sort;
 
         let sortOption = { createdAt : -1 };
         if(sort==='name'){
             sortOption = {businessName : 1}
         }
         
-
-        page = Number(req.query.page) || 1
-        limit = Number(req.query.limit) || 9
-
         const skip = (page-1)*limit
 
         const filter = {}
         if(city){
-            city = city.toLowerCase()
             filter.city = city
         }
         if(search){
-            search = search?.trim()
             filter.businessName = {
                 $regex: search,
                 $options: "i"
