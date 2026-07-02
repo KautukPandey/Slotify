@@ -5,19 +5,6 @@ export const createService = async(req,res) => {
     try {
         let {name,description,price,duration} = req.body
 
-        if(!name || !description || !price || !duration){
-            return res.status(400).json({message:"Fields cannot be empty"})
-        }
-
-        name = name.trim().toLowerCase()
-        description = description.trim()
-
-        if (price <= 0 || duration <= 0) {
-            return res.status(400).json({
-                message: "Price and duration must be greater than 0"
-            })
-        }
-
         const existingService = await Service.findOne({
             name,
             provider: req.provider._id
