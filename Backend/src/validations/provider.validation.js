@@ -21,3 +21,7 @@ export const getProvidersSchema = z.object({
     sort:
         z.enum(["name","newest"]).default("newest")
 });
+
+export const getProviderByIdSchema = z.object({
+    id: z.toString().regex( /^[0-9a-fA-F]{24}$/,"Invalid Provider ID")
+})
