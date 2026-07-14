@@ -9,7 +9,14 @@ export const validate = (schema, source = "body") => {
             });
         }
 
-        req[source] = result.data
+        if (source === "body") {
+            req.body = result.data;
+        } else if (source === "params") {
+            req.params = result.data;
+        } else if (source === "query") {
+            req.validatedQuery = result.data;   // ✅ don't overwrite req.query
+        }
+        
         next()
     }
 }

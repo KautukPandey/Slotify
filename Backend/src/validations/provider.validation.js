@@ -23,5 +23,5 @@ export const getProvidersSchema = z.object({
 });
 
 export const getProviderByIdSchema = z.object({
-    id: z.toString().regex( /^[0-9a-fA-F]{24}$/,"Invalid Provider ID")
+    id: z.string().regex( /^[0-9a-fA-F]{24}$/,"Invalid Provider ID")
 })

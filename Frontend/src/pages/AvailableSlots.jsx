@@ -2,6 +2,9 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import Badge from "../components/ui/Badge";
 import LoadingSpinner from "../components/LoadingSpinner";
 import slotService from "../services/slotService";
 import bookingService from "../services/bookingService";
@@ -87,232 +90,329 @@ const AvailableSlots = () => {
     const userTimezoneOffset = date.getTimezoneOffset() * 60000;
     const correctedDate = new Date(date.getTime() + userTimezoneOffset);
     return correctedDate.toLocaleDateString(undefined, {
-      weekday: "short", year: "numeric", month: "short", day: "numeric",
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const serviceName = service?.name || "Book Service";
 
   return (
-    <Layout>
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 animate-fade-in">
+    <Layout className="bg-[#F8FAFC]">
+      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 animate-fade-in text-left">
         <PageHeader
           title={`Book ${serviceName}`}
-          subtitle={service ? `Duration: ${service.duration} mins  ·  $${service.price.toFixed(2)}` : ""}
+          subtitle={
+            service
+              ? `Duration: ${service.duration} mins  ·  $${service.price.toFixed(2)}`
+              : ""
+          }
           showBack={true}
         />
 
         {loading ? (
-          <LoadingSpinner message="Loading service details..." />
-        ) : !service ? (
-          <div className="card p-12 text-center">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">Service not found</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">The service you're looking for doesn't exist.</p>
+          <div className="flex justify-center items-center py-20">
+            <LoadingSpinner message="Retrieving service options & calendars..." />
           </div>
+        ) : !service ? (
+          <Card className="p-12 text-center bg-white border border-slate-205">
+            <h3 className="text-lg font-bold text-slate-900 mb-1">
+              Service details not found
+            </h3>
+            <p className="text-sm text-slate-500">
+              The service or class you requested is not active.
+            </p>
+          </Card>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start mt-6">
             {/* Left Column - Service Info & Slots */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="card p-5 sm:p-6">
-                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 capitalize mb-2">{service.name}</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">{service.description}</p>
-                <div className="flex flex-wrap gap-3">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <Card className="bg-white border border-slate-200 p-5 sm:p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-base font-bold text-slate-900 capitalize">
+                    {service.name}
+                  </h3>
+                  <Badge variant="blue" className="font-bold">
+                    Active
+                  </Badge>
+                </div>
+                <p className="text-sm text-slate-500 leading-relaxed mb-5">
+                  {service.description}
+                </p>
+                <div className="flex flex-wrap gap-2.5">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 border border-slate-200/50 text-slate-600">
+                    <svg
+                      className="w-3.5 h-3.5 text-slate-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     {service.duration} mins
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-50 dark:bg-brand-950/30 text-brand-700 dark:text-brand-400">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold bg-blue-50 border border-blue-100/50 text-blue-600">
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     ${service.price.toFixed(2)}
                   </span>
                 </div>
-              </div>
+              </Card>
 
-              {/* Date Filter & Slots */}
-              <div className="card p-5 sm:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Available Time Slots</h3>
+              {/* Date Filter & Slots Card */}
+              <Card className="bg-white border border-slate-200 p-5 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-2 border-b border-slate-100">
+                  <h3 className="text-base font-bold text-slate-900">
+                    Select a Time Slot
+                  </h3>
                   <div className="flex items-center gap-2">
-                    <label htmlFor="slot-date" className="text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                      Filter by date:
-                    </label>
+                    <span className="text-xs font-semibold text-slate-400">
+                      Filter Date:
+                    </span>
                     <input
-                      id="slot-date"
                       type="date"
                       value={selectedDate}
                       onChange={(e) => setSelectedDate(e.target.value)}
-                      className="input w-auto py-1.5 text-xs"
+                      className="input py-1.5 px-3 text-xs w-[140px]"
                     />
                     {selectedDate && (
-                      <button onClick={() => setSelectedDate("")} className="btn-ghost text-xs px-2 py-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => setSelectedDate("")}
+                        className="text-xs px-2.5 py-1.5"
+                      >
                         Reset
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
 
                 {error && (
-                  <div className="p-3 mb-4 text-xs text-red-700 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-lg">
+                  <div className="p-3 mb-4 text-xs text-red-700 bg-red-50 border border-red-200 rounded-xl">
                     {error}
                   </div>
                 )}
 
                 {slotsLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                      <div className="w-5 h-5 rounded-full border-2 border-slate-200 dark:border-slate-700 border-t-brand-600 animate-spin" />
-                      Loading slots...
+                  <div className="flex items-center justify-center py-10">
+                    <div className="flex items-center gap-2 text-sm text-slate-400 font-bold select-none">
+                      <div className="w-5 h-5 rounded-full border-2 border-slate-200 border-t-blue-600 animate-spin" />
+                      Updating schedules...
                     </div>
                   </div>
                 ) : slots.length === 0 ? (
-                  <div className="text-center py-10">
-                    <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                  <div className="text-center py-10 select-none">
+                    <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-center mx-auto mb-3 text-slate-400">
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-1.875 5.25h.008v.008H2.25v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                        />
                       </svg>
                     </div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      No open time slots found{selectedDate ? " for this date" : ""}.
+                    <p className="text-sm font-medium text-slate-550">
+                      No slots available{selectedDate ? " for this date" : ""}.
+                    </p>
+                    <p className="text-xs text-slate-450 mt-1">
+                      Check back later or try another calendar date.
                     </p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {slots.map((slot) => {
-                      const isSelected = selectedSlot?._id === slot._id;
+                    {slots.map((s) => {
+                      const isSelected = selectedSlot?._id === s._id;
                       return (
                         <button
-                          key={slot._id}
+                          key={s._id}
                           onClick={() => {
-                            setSelectedSlot(slot);
+                            setSelectedSlot(s);
                             setBookingSuccess(false);
                             setBookingError(null);
                           }}
-                          className={`flex flex-col items-center justify-center p-3.5 text-xs rounded-xl border transition-all cursor-pointer ${
-                            isSelected
-                              ? "bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-500/20 scale-[1.02]"
-                              : "bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-800 dark:text-slate-100 border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-700"
-                          }`}
+                          className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all cursor-pointer ${isSelected
+                              ? "bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/20 scale-[1.02]"
+                              : "bg-white hover:bg-slate-50 text-slate-800 border-slate-200 hover:border-slate-300"
+                            }`}
                         >
-                          <span className={`font-semibold ${isSelected ? "text-white" : "text-slate-900 dark:text-slate-50"}`}>
-                            {slot.time}
+                          <span
+                            className={`text-sm font-bold ${isSelected ? "text-white" : "text-slate-900"
+                              }`}
+                          >
+                            {s.time}
                           </span>
-                          <span className={`text-[10px] mt-1.5 ${isSelected ? "text-brand-200" : "text-slate-500 dark:text-slate-400"}`}>
-                            {formatDate(slot.date)}
+                          <span
+                            className={`text-[10px] mt-1.5 font-bold ${isSelected ? "text-blue-200" : "text-slate-450"
+                              }`}
+                          >
+                            {formatDate(s.date)}
                           </span>
                         </button>
                       );
                     })}
                   </div>
                 )}
-              </div>
+              </Card>
             </div>
 
-            {/* Right Column - Booking Summary */}
+            {/* Right Column - Booking Summary Card */}
             <div className="space-y-4">
               {bookingSuccess && (
-                <div className="card p-5 border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20 space-y-3 animate-scale-in">
+                <Card className="p-5 border-emerald-200 bg-emerald-50/40 space-y-3.5 animate-scale-in text-slate-900">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                      <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     </div>
-                    <h4 className="text-sm font-semibold text-emerald-800 dark:text-emerald-400">Booking Confirmed!</h4>
+                    <h4 className="text-sm font-bold text-emerald-800">
+                      Booking Scheduled!
+                    </h4>
                   </div>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-300/80 leading-relaxed">
-                    Your appointment has been scheduled successfully.
+                  <p className="text-xs text-emerald-605 leading-relaxed font-medium">
+                    Your appointment confirmation slot has been successfully booked.
                   </p>
-                  <Link to="/bookings" className="btn-primary text-xs w-full justify-center bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/15">
-                    View My Bookings
+                  <Link to="/bookings" className="block pt-1">
+                    <Button className="w-full justify-center bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/10 text-xs py-2 h-9">
+                      My Bookings
+                    </Button>
                   </Link>
-                </div>
+                </Card>
               )}
 
               {bookingError && (
-               <div className="p-3 mb-4 text-xs text-red-700 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-lg flex items-center gap-2">
-                  <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                <div className="p-3.5 text-xs text-red-700 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4 shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
                   </svg>
-                  {bookingError}
+                  <span>{bookingError}</span>
                 </div>
               )}
 
-              <div className="card p-5 sm:p-6">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Booking Summary</h3>
+              <Card className="bg-white border border-slate-200 p-5 sm:p-6 text-left">
+                <h3 className="text-sm font-extrabold text-slate-905 uppercase tracking-wider mb-4 pb-2 border-b border-slate-100 select-none">
+                  Booking Summary
+                </h3>
 
                 {selectedSlot ? (
-                  <form onSubmit={handleBookingSubmit} className="space-y-4">
-                    <div className="text-sm space-y-3">
-                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800">
-                        <span className="text-slate-500 dark:text-slate-400">Date</span>
-                        <span className="font-medium text-slate-800 dark:text-slate-200">{formatDate(selectedSlot.date)}</span>
+                  <form onSubmit={handleBookingSubmit} className="space-y-5">
+                    <div className="text-sm space-y-3 font-semibold">
+                      <div className="flex justify-between items-center py-1">
+                        <span className="text-slate-400 font-medium">Date</span>
+                        <span className="text-slate-800">
+                          {formatDate(selectedSlot.date)}
+                        </span>
                       </div>
-                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800">
-                        <span className="text-slate-500 dark:text-slate-400">Time</span>
-                        <span className="font-medium text-slate-800 dark:text-slate-200">{selectedSlot.time}</span>
+                      <div className="flex justify-between items-center py-1">
+                        <span className="text-slate-400 font-medium">Time</span>
+                        <span className="text-slate-800">{selectedSlot.time}</span>
                       </div>
-                      <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800">
-                        <span className="text-slate-500 dark:text-slate-400">Duration</span>
-                        <span className="font-medium text-slate-800 dark:text-slate-200">{service.duration} mins</span>
+                      <div className="flex justify-between items-center py-1">
+                        <span className="text-slate-400 font-medium">Duration</span>
+                        <span className="text-slate-800">{service.duration} mins</span>
                       </div>
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-slate-500 dark:text-slate-400">Price</span>
-                        <span className="font-bold text-lg text-slate-900 dark:text-slate-50">${service.price.toFixed(2)}</span>
+                      <div className="flex justify-between items-center pt-3 border-t border-slate-100">
+                        <span className="text-slate-900 font-bold">Total price</span>
+                        <span className="text-lg font-extrabold text-blue-600">
+                          ${service.price.toFixed(2)}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label htmlFor="booking-note" className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                        Notes (optional)
+                    <div className="space-y-1.5 pt-1">
+                      <label
+                        htmlFor="booking-note"
+                        className="text-xs font-bold text-slate-500"
+                      >
+                        Notes
                       </label>
                       <textarea
                         id="booking-note"
                         rows="3"
-                        placeholder="Any specific requests for the provider..."
+                        placeholder="Provide details about requirements..."
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
-                        className="input resize-none"
+                        className="input text-xs resize-none"
                       />
                     </div>
 
-                    <button type="submit" disabled={bookingLoading} className="btn-primary w-full">
-                      {bookingLoading ? (
-                        <>
-                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                          </svg>
-                          Scheduling...
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          Confirm Booking
-                        </>
-                      )}
-                    </button>
+                    <Button
+                      type="submit"
+                      isLoading={bookingLoading}
+                      className="w-full font-bold"
+                    >
+                      Confirm Booking Slot
+                    </Button>
                   </form>
                 ) : (
-                  <div className="text-center py-8">
-                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                  <div className="text-center py-8 select-none text-slate-405">
+                    <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-205 flex items-center justify-center mx-auto mb-3 text-slate-400">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 12.408l-1.62 1.62A2.25 2.25 0 016.59 18H4.5A2.25 2.25 0 012.25 15.75v-10.5A2.25 2.25 0 014.5 3h2.09a2.25 2.25 0 011.606.66l1.62 1.62m.008 10.5H15M9 14h6"
+                        />
                       </svg>
                     </div>
-                    <p className="text-sm text-slate-400 dark:text-slate-500">
+                    <p className="text-xs font-semibold">
                       {bookingSuccess
-                        ? "Choose another slot to book again."
-                        : "Please select a time slot to review your booking."}
+                        ? "Select another slot to schedule."
+                        : "Select open slot above."}
                     </p>
                   </div>
                 )}
-              </div>
+              </Card>
             </div>
           </div>
         )}
