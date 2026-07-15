@@ -14,7 +14,7 @@ export const validate = (schema, source = "body") => {
         } else if (source === "params") {
             req.params = result.data;
         } else if (source === "query") {
-            req.validatedQuery = result.data;   // ✅ don't overwrite req.query
+            req.validatedQuery = result.data;   
         }
         
         next()
