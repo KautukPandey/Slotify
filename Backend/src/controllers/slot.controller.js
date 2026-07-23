@@ -5,9 +5,7 @@ import Booking from "../models/booking.model.js";
 export const createSlot = async (req, res) => {
   try {
     const { date, time, serviceId } = req.body;
-    if (!date || !time || !serviceId) {
-      return res.status(400).json({ message: "Complete fields required" });
-    }
+    
     const service = await Service.findById(serviceId);
     if (!service) {
       return res.status(400).json({ message: "Service does not exist" });
@@ -43,11 +41,7 @@ export const getAvailableSlots = async (req, res) => {
   try {
     const { date, serviceId } = req.query;
 
-    if (!serviceId) {
-      return res.status(400).json({
-        message: "serviceId is required",
-      });
-    }
+   
 
     const service = await Service.findById(serviceId);
 

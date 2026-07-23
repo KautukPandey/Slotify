@@ -21,4 +21,5 @@ export const createServiceSchema = z.object({
     .coerce
     .number()
     .positive("Duration must be greater than 0")
+    .max(1440,"Duration cannot exceed 24 hours")
 })
