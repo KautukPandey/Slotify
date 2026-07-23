@@ -5,17 +5,9 @@ import jwt from "jsonwebtoken"
 export const registerUser = async(req,res)=>{
     try {
         const {name,email,password,city,role} = req.body
-        if(!name || !email || !password || !city){
-            return res.status(400).json({message:"Bad request!! Fields cannot be empty"})
-        }
-        const assignedRole = ['customer','provider'].includes(role) ? role : 'customer'
+    
         const lowerEmail = email.toLowerCase()
-        if(!lowerEmail.includes('@')){
-            return res.status(400).json({message:"Invalid email format"})
-        }
-        if(password.length<6){
-            return res.status(400).json({message:"Password must be at least 6 characters"})
-        }
+        
         const existingUser = await User.findOne({email:lowerEmail})
         if(existingUser){
             return res.status(409).json({message:"User already exists"})
@@ -44,12 +36,7 @@ export const registerUser = async(req,res)=>{
 export const loginUser = async(req,res)=>{
     try {
         const {email,password} = req.body
-        if(!email || !password){
-            return res.status(400).json({message:"Fields cannot be empty"})
-        }
-        const lowerEmail = email.toLowerCase()
         
-
         const user = await User.findOne({email:lowerEmail})
         if(!user){
             return res.status(401).json({message:"Invalid credentials"})
