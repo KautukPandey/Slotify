@@ -1,13 +1,11 @@
 import Booking from "../models/booking.model.js";
 import Slot from "../models/slot.model.js";
-import Review from "../models/review.model.js";
+
 
 export const createBooking = async(req,res) => {
     try {
         const {slotId,note} = req.body
-        if(!slotId){
-            return res.status(400).json({message: "Slot Id is required"})
-        }
+        
 
         const slot = await Slot.findById(slotId)
         if(!slot){
@@ -100,9 +98,7 @@ export const getMyBookings = async(req,res) => {
 export const cancelBooking = async(req,res) => {
     try {
         const {bookingId} = req.body
-        if(!bookingId){
-            return res.status(400).json({message: "Booking ID missing"})
-        }
+        
         const booking = await Booking.findById(bookingId)
         if(!booking){
             return res.status(404).json({message: "Booking doesn't exists"})
@@ -168,9 +164,7 @@ export const getProviderBookings = async(req,res) => {
 export const completeBooking = async(req,res) => {
     try {
         const {bookingId} = req.body
-        if(!bookingId){
-            return res.status(400).json({message: "Booking ID missing"})
-        }
+        
         const booking = await Booking.findById(bookingId)
         if(!booking){
             return res.status(404).json({message: "Booking doesn't exists"})
